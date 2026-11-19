@@ -686,23 +686,26 @@
           <!-- 2A: Total Session Time Input -->
           <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 space-y-2.5">
             <div class="flex flex-wrap items-center justify-between gap-2">
-              <label class="text-xs font-extrabold text-white">1. 請輸入開團總時間（例如：<span class="text-emerald-300">18-21</span> 或 <span class="text-emerald-300">09-12</span>）</label>
-              <div class="flex items-center gap-1.5">
+              <label class="text-xs font-extrabold text-white">1. 請輸入開團總時間（支援過夜團與半點，如 <span class="text-emerald-300">18-21</span>、<span class="text-emerald-300">9.5-12.5</span>、<span class="text-emerald-300">23-03</span>）</label>
+              <div class="flex items-center gap-1.5 flex-wrap">
                 <span class="text-[11px] text-slate-400">快速範例：</span>
                 <button type="button" onclick="setWizardTotalTimePreset('18-21')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-emerald-300 font-bold border border-slate-700">18-21</button>
-                <button type="button" onclick="setWizardTotalTimePreset('19-22')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-emerald-300 font-bold border border-slate-700">19-22</button>
-                <button type="button" onclick="setWizardTotalTimePreset('14-17')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-emerald-300 font-bold border border-slate-700">14-17</button>
+                <button type="button" onclick="setWizardTotalTimePreset('9.5-12.5')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-emerald-300 font-bold border border-slate-700">9.5-12.5 (半點)</button>
+                <button type="button" onclick="setWizardTotalTimePreset('23-03')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-amber-300 font-bold border border-amber-500/40">23-03 (過夜團)</button>
               </div>
             </div>
 
             <div class="flex items-center gap-2.5 flex-wrap">
-              <input type="text" id="wiz-total-slot-input" value="18-21" placeholder="例如：18-21"
+              <input type="text" id="wiz-total-slot-input" value="18-21" placeholder="例如：18-21 或 23-03"
                 oninput="onWizardTotalSlotInput()"
-                class="w-36 bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-sm font-black text-emerald-300 tracking-wider text-center focus:outline-none focus:border-emerald-400" />
+                class="w-40 bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-sm font-black text-emerald-300 tracking-wider text-center focus:outline-none focus:border-emerald-400" />
               <span id="wiz-total-slot-parsed-hint" class="text-xs text-slate-300 font-semibold">
                 全場時段：18:00 - 21:00（共 3 小時）
               </span>
             </div>
+            <p class="text-[11px] text-slate-400">
+              💡 輸入提示：支援 <code class="text-slate-200">9.5</code> 或 <code class="text-slate-200">9:30</code> 代表 09:30；結束時間小於開始時間（如 <code class="text-amber-300">23-03</code>）會自動識別為跨夜隔日
+            </p>
           </div>
 
           <!-- 2B: Ask if there are different sub-timeslot operating modes -->
@@ -710,7 +713,7 @@
             <div class="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <div class="text-xs font-extrabold text-white">2. 是否有不同時段的經營模式？</div>
-                <div class="text-[11px] text-slate-400">例如總時間 18-21，另外開放球友報名半場時段（如 18-20、19-21）</div>
+                <div class="text-[11px] text-slate-400">例如總時間 18-21，另外開放半場時段（如 18-20、19.5-21）；過夜團 23-03 可設 23-01</div>
               </div>
               <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
                 <button type="button" onclick="setWizardSubSlotMode(false)" id="wiz-subslot-no"
@@ -725,9 +728,9 @@
             </div>
 
             <!-- Sub-Timeslot Adder (Visible when hasSubSlots === true) -->
-            <div id="wizard-subslots-editor" class="space-y-3 pt-2.5 border-t border-slate-800">
+            <div id="wizard-subslots-editor" class="hidden space-y-3 pt-2.5 border-t border-slate-800">
               <div class="flex flex-wrap items-center gap-2">
-                <input type="text" id="wiz-new-subslot-input" placeholder="輸入時段，例如 18-20 或 19-21"
+                <input type="text" id="wiz-new-subslot-input" placeholder="輸入時段，如 18-20、9.5-11.5 或 23-01"
                   onkeydown="if(event.key==='Enter'){event.preventDefault(); addWizardSubSlot();}"
                   class="flex-1 min-w-[180px] bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-indigo-400" />
                 <button type="button" onclick="addWizardSubSlot()"
@@ -736,16 +739,17 @@
                 </button>
                 <button type="button" onclick="quickFillSubSlotsFromTotal()"
                   class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sky-300 font-bold text-xs transition"
-                  title="依據總時間自動帶入前後半場時段（如 18-20 與 19-21）">
+                  title="依據總時間自動帶入前後半場時段（支援跨夜與小數點半小時）">
                   <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>自動帶入前後半場
                 </button>
               </div>
+            </div>
 
-              <div>
-                <div class="text-[11px] font-bold text-slate-400 mb-1.5">目前啟用的所有排點時段（系統將自動依時段長短與進場時間智慧加權排點）：</div>
-                <div id="wizard-subslots-list" class="flex flex-wrap gap-2">
-                  <!-- Dynamically rendered -->
-                </div>
+            <!-- Always visible: Currently Active Time Slots Preview (Dynamically synced with Total Time) -->
+            <div class="pt-2.5 border-t border-slate-800/80">
+              <div class="text-[11px] font-bold text-slate-400 mb-1.5">目前啟用的所有排點時段（自動依據上方「開團總時間」即時調整）：</div>
+              <div id="wizard-subslots-list" class="flex flex-wrap gap-2">
+                <!-- Dynamically rendered -->
               </div>
             </div>
           </div>
@@ -1551,25 +1555,95 @@
       return !!(player && player.isHost);
     }
 
-    // Parse any "start-end" string like "18-21" into { raw: '18-21', start: 18, end: 21, duration: 3 }
+    // Format numeric hour (e.g., 9.5 -> "9.5", 25 -> "01", 25.5 -> "1.5", 18 -> "18")
+    function formatHourToken(numVal) {
+      const wrapped = ((numVal % 24) + 24) % 24;
+      const rounded = Math.round(wrapped * 100) / 100;
+      if (Number.isInteger(rounded)) {
+        return rounded < 10 ? String(rounded) : String(rounded);
+      }
+      return String(rounded);
+    }
+
+    // Format numeric hour into HH:MM clock display (e.g., 9.5 -> "09:30", 25 -> "01:00 (隔日)")
+    function formatHourToClock(numVal, showNextDay = false) {
+      const isNextDay = numVal >= 24;
+      const wrapped = ((numVal % 24) + 24) % 24;
+      const hours = Math.floor(wrapped);
+      const mins = Math.round((wrapped - hours) * 60);
+      const hh = String(hours).padStart(2, '0');
+      const mm = String(mins).padStart(2, '0');
+      return `${hh}:${mm}${showNextDay && isNextDay ? '(隔日)' : ''}`;
+    }
+
+    // Parse a single time token: supports "9", "09", "9.5", "9:30", "23.25", "23:15"
+    function parseSingleTimeToken(tokenStr) {
+      if (!tokenStr) return null;
+      const s = tokenStr.trim().replace(/：/g, ':');
+      if (s.includes(':')) {
+        const m = s.match(/^(\d{1,2}):(\d{1,2})$/);
+        if (!m) return null;
+        const h = parseInt(m[1], 10);
+        const min = parseInt(m[2], 10);
+        if (isNaN(h) || isNaN(min) || h < 0 || h > 24 || min < 0 || min >= 60) return null;
+        if (h === 24 && min > 0) return null;
+        return Math.round((h + min / 60) * 100) / 100;
+      }
+      const num = Number(s);
+      if (isNaN(num) || num < 0 || num > 24) return null;
+      return Math.round(num * 100) / 100;
+    }
+
+    // Parse any "start-end" string like "18-21", "9.5-12.5", "9:30-12:30", or overnight "23-03"
+    // Returns { raw, start, end, absEnd, duration, isOvernight, clockRange }
     function parseTimeRange(slotStr) {
       if (!slotStr || typeof slotStr !== 'string') return null;
       const cleaned = slotStr.trim().replace(/：/g, ':').replace(/～|~/g, '-');
-      const match = cleaned.match(/^(\d{1,2})(?::00)?\s*-\s*(\d{1,2})(?::00)?$/);
-      if (!match) return null;
-      const start = parseInt(match[1], 10);
-      const end = parseInt(match[2], 10);
-      if (isNaN(start) || isNaN(end) || start < 0 || end > 24 || end <= start) return null;
+      const parts = cleaned.split('-');
+      if (parts.length !== 2) return null;
+
+      const start = parseSingleTimeToken(parts[0]);
+      const end = parseSingleTimeToken(parts[1]);
+      if (start === null || end === null || start === end) return null;
+
+      // If end < start (e.g. 23-03 or 22.5-02), treat as overnight crossing midnight (+24h)
+      const isOvernight = end < start;
+      const absEnd = isOvernight ? end + 24 : end;
+      const duration = Math.round((absEnd - start) * 100) / 100;
+      if (duration <= 0 || duration > 24) return null;
+
+      // Preserve clean normalized token (pad single-digit integer end when overnight like 23-03 for readability)
+      const startTok = formatHourToken(start);
+      let endTok = formatHourToken(end);
+      if (isOvernight && Number.isInteger(end) && end < 10) {
+        endTok = '0' + end;
+      }
+
       return {
-        raw: `${start}-${end}`,
+        raw: `${startTok}-${endTok}`,
         start,
         end,
-        duration: end - start
+        absEnd,
+        duration,
+        isOvernight,
+        clockRange: `${formatHourToClock(start, false)} - ${formatHourToClock(absEnd, isOvernight)}`
       };
     }
 
+    // Align a sub-slot's start & absEnd onto the timeline of totalParsed (handles overnight wrap)
+    function alignSubSlotToTotalTimeline(subParsed, totalParsed) {
+      if (!subParsed || !totalParsed) return null;
+      let s = subParsed.start;
+      let e = subParsed.absEnd;
+      if (totalParsed.isOvernight && s < totalParsed.start) {
+        s += 24;
+        e += 24;
+      }
+      return { start: s, absEnd: e, duration: subParsed.duration };
+    }
+
     function getAllConfiguredSlots() {
-      const cfg = state.sessionConfig || { totalSlot: '18-21', hasSubSlots: true, subSlots: ['18-20', '19-21'] };
+      const cfg = state.sessionConfig || { totalSlot: '18-21', hasSubSlots: false, subSlots: [] };
       const total = cfg.totalSlot || '18-21';
       if (!cfg.hasSubSlots || !Array.isArray(cfg.subSlots) || cfg.subSlots.length === 0) {
         return [total];
@@ -1582,10 +1656,18 @@
     }
 
     function getHourlyPeriodsFromTotalSlot() {
-      const parsed = parseTimeRange(state.sessionConfig?.totalSlot || '18-21') || { start: 18, end: 21 };
+      const parsed = parseTimeRange(state.sessionConfig?.totalSlot || '18-21') || { start: 18, absEnd: 21 };
       const hours = [];
-      for (let h = parsed.start; h < parsed.end; h++) {
-        hours.push(`${h}-${h + 1}`);
+      let cursor = parsed.start;
+      while (cursor < parsed.absEnd - 0.001) {
+        const next = Math.min(parsed.absEnd, Math.round((cursor + 1) * 100) / 100);
+        const sTok = formatHourToken(cursor);
+        let eTok = formatHourToken(next);
+        if (next >= 24 && Number.isInteger(next % 24) && (next % 24) < 10) {
+          eTok = '0' + (next % 24);
+        }
+        hours.push(`${sTok}-${eTok}`);
+        cursor = next;
       }
       return hours;
     }
@@ -1628,8 +1710,8 @@
       noHostMode: false,
       sessionConfig: {
         totalSlot: '18-21',
-        hasSubSlots: true,
-        subSlots: ['18-20', '19-21']
+        hasSubSlots: false,
+        subSlots: []
       },
       customIconDataUrl: null,
       customIconPreset: 'DEFAULT_6796',
@@ -1670,8 +1752,8 @@
       noHostMode: false,
       hosts: [],
       totalSlot: '18-21',
-      hasSubSlots: true,
-      subSlots: ['18-20', '19-21']
+      hasSubSlots: false,
+      subSlots: []
     };
 
     function normalizePrepSlotsArray() {
@@ -1728,8 +1810,8 @@
           if (!state.sessionConfig || !state.sessionConfig.totalSlot) {
             state.sessionConfig = {
               totalSlot: '18-21',
-              hasSubSlots: true,
-              subSlots: ['18-20', '19-21']
+              hasSubSlots: false,
+              subSlots: []
             };
           }
           if (!Array.isArray(state.courts) || state.courts.length === 0) {
@@ -2121,10 +2203,11 @@
         level: h.level || 7
       }));
       wizardTemp.totalSlot = state.sessionConfig?.totalSlot || '18-21';
-      wizardTemp.hasSubSlots = state.sessionConfig ? !!state.sessionConfig.hasSubSlots : true;
-      wizardTemp.subSlots = Array.isArray(state.sessionConfig?.subSlots)
+      // 首次開啟設定精靈（尚未完成設定）時，預設「是否有不同時段的經營模式？」固定為「無 (false)」
+      wizardTemp.hasSubSlots = state.setupCompleted && state.sessionConfig ? !!state.sessionConfig.hasSubSlots : false;
+      wizardTemp.subSlots = (state.setupCompleted && Array.isArray(state.sessionConfig?.subSlots))
         ? [...state.sessionConfig.subSlots]
-        : ['18-20', '19-21'];
+        : [];
 
       const totalInput = document.getElementById('wiz-total-slot-input');
       if (totalInput) totalInput.value = wizardTemp.totalSlot;
@@ -2202,16 +2285,35 @@
       const raw = document.getElementById('wiz-total-slot-input')?.value || '';
       const parsed = parseTimeRange(raw);
       const hint = document.getElementById('wiz-total-slot-parsed-hint');
+      const subInput = document.getElementById('wiz-new-subslot-input');
+
       if (parsed) {
         wizardTemp.totalSlot = parsed.raw;
         if (hint) {
           hint.className = 'text-xs text-emerald-300 font-bold';
-          hint.textContent = `✅ 全場時段：${parsed.start}:00 - ${parsed.end}:00（共 ${parsed.duration} 小時）`;
+          const overnightTag = parsed.isOvernight ? '🌙 跨夜團・' : '✅ ';
+          hint.textContent = `${overnightTag}全場時段：${parsed.clockRange}（共 ${parsed.duration} 小時）`;
+        }
+        // Filter out sub-slots that fall outside the updated total slot timeline
+        if (Array.isArray(wizardTemp.subSlots) && wizardTemp.subSlots.length > 0) {
+          wizardTemp.subSlots = wizardTemp.subSlots.filter(s => {
+            const sp = parseTimeRange(s);
+            const aligned = alignSubSlotToTotalTimeline(sp, parsed);
+            return aligned && aligned.start >= parsed.start - 0.001 && aligned.absEnd <= parsed.absEnd + 0.001 && sp.raw !== parsed.raw;
+          });
+        }
+        // Dynamically update sub-slot placeholder example based on current total time
+        if (subInput) {
+          const halfDur = Math.max(0.5, Math.round((parsed.duration * 2 / 3) * 2) / 2);
+          const ex1End = formatHourToken(parsed.start + halfDur);
+          const ex2Start = formatHourToken(parsed.absEnd - halfDur);
+          const ex2End = parsed.isOvernight && Number.isInteger(parsed.end) && parsed.end < 10 ? '0' + parsed.end : formatHourToken(parsed.end);
+          subInput.placeholder = `輸入時段，例如 ${formatHourToken(parsed.start)}-${ex1End} 或 ${ex2Start}-${ex2End}`;
         }
       } else {
         if (hint) {
           hint.className = 'text-xs text-rose-400 font-bold';
-          hint.textContent = `⚠️ 格式請輸入「開始-結束」(24小時制整點，如 18-21)`;
+          hint.textContent = `⚠️ 請輸入「開始-結束」(支援小數點如 9.5-12.5，或過夜團如 23-03)`;
         }
       }
       renderWizardSubSlotsList();
@@ -2226,13 +2328,16 @@
       const input = document.getElementById('wiz-new-subslot-input');
       const parsed = parseTimeRange(input?.value || '');
       if (!parsed) {
-        showToast('請輸入有效的時段格式，例如 18-20 或 19-21', 'warn');
+        showToast('請輸入有效的時段格式，例如 18-20、9.5-11.5 或 23-01', 'warn');
         return;
       }
       const totalParsed = parseTimeRange(wizardTemp.totalSlot);
-      if (totalParsed && (parsed.start < totalParsed.start || parsed.end > totalParsed.end)) {
-        showToast(`子時段 (${parsed.raw}) 需在開團總時間 (${totalParsed.raw}) 範圍內！`, 'warn');
-        return;
+      if (totalParsed) {
+        const aligned = alignSubSlotToTotalTimeline(parsed, totalParsed);
+        if (!aligned || aligned.start < totalParsed.start - 0.001 || aligned.absEnd > totalParsed.absEnd + 0.001) {
+          showToast(`子時段 (${parsed.clockRange}) 需在開團總時間 (${totalParsed.clockRange}) 範圍內！`, 'warn');
+          return;
+        }
       }
       if (parsed.raw === wizardTemp.totalSlot) {
         showToast(`全場時段 (${parsed.raw}) 已預設包含，請輸入其他子時段`, 'info');
@@ -2244,7 +2349,7 @@
       }
       input.value = '';
       renderWizardSubSlotsList();
-      showToast(`已新增經營時段：${parsed.raw}`, 'success');
+      showToast(`已新增經營時段：${parsed.raw}（${parsed.clockRange}）`, 'success');
     }
 
     function removeWizardSubSlot(slotStr) {
@@ -2254,21 +2359,34 @@
 
     function quickFillSubSlotsFromTotal() {
       const totalParsed = parseTimeRange(wizardTemp.totalSlot);
-      if (!totalParsed || totalParsed.duration < 2) {
-        showToast('總時段需至少 2 小時才能自動拆分前後時段', 'warn');
+      if (!totalParsed || totalParsed.duration < 1) {
+        showToast('總時段需至少 1 小時才能自動拆分前後時段', 'warn');
         return;
       }
       const generated = [];
-      if (totalParsed.duration === 3) {
-        generated.push(`${totalParsed.start}-${totalParsed.start + 2}`);
-        generated.push(`${totalParsed.start + 1}-${totalParsed.end}`);
+      const fmtEnd = (val) => {
+        const mod = ((val % 24) + 24) % 24;
+        if (totalParsed.isOvernight && Number.isInteger(mod) && mod < 10) return '0' + mod;
+        return formatHourToken(mod);
+      };
+
+      if (totalParsed.duration >= 3) {
+        // e.g. 18-21 -> 18-20 & 19-21; 23-03 (4h) -> 23-01 & 01-03; 9.5-12.5 (3h) -> 9.5-11.5 & 10.5-12.5
+        const subLen = totalParsed.duration === 3 ? 2 : Math.round((totalParsed.duration / 2) * 2) / 2;
+        const s1 = `${formatHourToken(totalParsed.start)}-${fmtEnd(totalParsed.start + subLen)}`;
+        const s2 = `${formatHourToken(totalParsed.absEnd - subLen)}-${fmtEnd(totalParsed.absEnd)}`;
+        generated.push(s1, s2);
       } else {
-        const mid = Math.floor((totalParsed.start + totalParsed.end) / 2);
-        generated.push(`${totalParsed.start}-${mid}`);
-        generated.push(`${mid}-${totalParsed.end}`);
+        const mid = Math.round(((totalParsed.start + totalParsed.absEnd) / 2) * 2) / 2;
+        const s1 = `${formatHourToken(totalParsed.start)}-${fmtEnd(mid)}`;
+        const s2 = `${formatHourToken(mid)}-${fmtEnd(totalParsed.absEnd)}`;
+        generated.push(s1, s2);
       }
+
       generated.forEach(s => {
-        if (!wizardTemp.subSlots.includes(s)) wizardTemp.subSlots.push(s);
+        if (s !== totalParsed.raw && !wizardTemp.subSlots.includes(s)) {
+          wizardTemp.subSlots.push(s);
+        }
       });
       renderWizardSubSlotsList();
       showToast(`已自動帶入子時段：${generated.join('、')}`, 'success');
@@ -2335,16 +2453,34 @@
     function renderWizardSubSlotsList() {
       const listEl = document.getElementById('wizard-subslots-list');
       if (!listEl) return;
-      const totalParsed = parseTimeRange(wizardTemp.totalSlot);
-      const totalChip = totalParsed
-        ? `<span class="px-3 py-1 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-extrabold">
-             全場時段：${totalParsed.raw} (${totalParsed.duration}小時)
-           </span>`
-        : '';
+      const rawInput = document.getElementById('wiz-total-slot-input')?.value || wizardTemp.totalSlot;
+      const totalParsed = parseTimeRange(rawInput) || parseTimeRange(wizardTemp.totalSlot);
 
-      const subChips = wizardTemp.subSlots.map(s => {
+      if (!totalParsed) {
+        listEl.innerHTML = `<span class="text-xs text-rose-400 font-semibold">請先於上方第 1 題輸入有效的開團總時間（例如 18-21、9.5-12.5 或 23-03）</span>`;
+        return;
+      }
+
+      const totalChip = `
+        <span class="px-3 py-1 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-extrabold">
+          全場時段：${totalParsed.raw}｜${totalParsed.clockRange} (${totalParsed.duration}小時)
+        </span>
+      `;
+
+      if (!wizardTemp.hasSubSlots) {
+        listEl.innerHTML = totalChip + `<span class="text-[11px] text-slate-400 self-center">（單一全場時段經營）</span>`;
+        return;
+      }
+
+      const validSubs = (wizardTemp.subSlots || []).filter(s => {
+        const sp = parseTimeRange(s);
+        const aligned = alignSubSlotToTotalTimeline(sp, totalParsed);
+        return aligned && aligned.start >= totalParsed.start - 0.001 && aligned.absEnd <= totalParsed.absEnd + 0.001 && sp.raw !== totalParsed.raw;
+      });
+
+      const subChips = validSubs.map(s => {
         const p = parseTimeRange(s);
-        const durText = p ? `${p.duration}小時` : '';
+        const durText = p ? `${p.clockRange}・${p.duration}小時` : '';
         return `
           <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-sky-500/20 border border-sky-500/40 text-sky-300 text-xs font-bold">
             <span>子時段：${escapeHTML(s)} ${durText ? `(${durText})` : ''}</span>
@@ -2355,16 +2491,32 @@
         `;
       }).join('');
 
-      listEl.innerHTML = totalChip + subChips;
+      const emptySubHint = validSubs.length === 0
+        ? `<span class="text-[11px] text-amber-300/90 self-center">尚未新增子時段，可於上方輸入或點「自動帶入前後半場」</span>`
+        : '';
+
+      listEl.innerHTML = totalChip + subChips + emptySubHint;
+    }
+    // Generalized eligibility check for any hourly period filter (supports overnight wrap & decimal half-hours)
+    function isPlayerEligibleInCurrentHour(player) {
+      if (!player) return false;
+      if (state.currentHourFilter === 'ALL') return true;
+      const totalRange = parseTimeRange(state.sessionConfig?.totalSlot || '18-21');
+      const filterRange = parseTimeRange(state.currentHourFilter);
+      const playerRange = parseTimeRange(player.timeSlot);
+      if (!filterRange || !playerRange) return true;
+
+      if (totalRange) {
+        const alignedFilter = alignSubSlotToTotalTimeline(filterRange, totalRange);
+        const alignedPlayer = alignSubSlotToTotalTimeline(playerRange, totalRange);
+        if (alignedFilter && alignedPlayer) {
+          return alignedPlayer.start <= alignedFilter.start + 0.001 && alignedPlayer.absEnd >= alignedFilter.absEnd - 0.001;
+        }
+      }
+      return playerRange.start <= filterRange.start + 0.001 && playerRange.absEnd >= filterRange.absEnd - 0.001;
     }
 
     function saveSetupWizard() {
-      const nameInput = document.getElementById('wiz-new-host-name');
-      if (!wizardTemp.noHostMode && nameInput && nameInput.value.trim()) {
-        // Automatically add typed host if user forgot to click "+ 加入團主"
-        addWizardHost();
-      }
-
       if (!wizardTemp.noHostMode && wizardTemp.hosts.length === 0) {
         showToast('請至少新增一位團主，若本次無團主請切換為「不要團主」！', 'warn');
         return;
@@ -2605,16 +2757,6 @@
       return { text: timeSlot || totalSlot, classes: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30' };
     }
 
-    // Generalized eligibility check for any hourly period filter (e.g. "18-19") and any player timeSlot (e.g. "18-20", "19-21")
-    function isPlayerEligibleInCurrentHour(player) {
-      if (!player) return false;
-      if (state.currentHourFilter === 'ALL') return true;
-      const filterRange = parseTimeRange(state.currentHourFilter);
-      const playerRange = parseTimeRange(player.timeSlot);
-      if (!filterRange || !playerRange) return true;
-      return playerRange.start <= filterRange.start && playerRange.end >= filterRange.end;
-    }
-
     function getPlayerLocation(playerId) {
       for (let c = 0; c < state.courts.length; c++) {
         const sIdx = state.courts[c].slots.indexOf(playerId);
@@ -2641,25 +2783,27 @@
      * 6. UNIVERSAL MULTI-TIMESLOT SMART AUTO-MATCHING, BINDING & NOVICE MODE
      ********************************************************************/
     function getSessionGamesPerHourRate() {
-      const totalParsed = parseTimeRange(state.sessionConfig?.totalSlot || '18-21') || { start: 18, end: 21, duration: 3 };
+      const totalParsed = parseTimeRange(state.sessionConfig?.totalSlot || '18-21') || { start: 18, absEnd: 21, duration: 3 };
       const earlyPlayers = state.players.filter(p => {
         if (isHostPlayer(p)) return false;
         if (!p.checkedIn && (p.games || 0) === 0) return false;
         const r = parseTimeRange(p.timeSlot);
-        return !r || r.start <= totalParsed.start;
+        const aligned = alignSubSlotToTotalTimeline(r, totalParsed);
+        return !aligned || aligned.start <= totalParsed.start + 0.001;
       });
       if (earlyPlayers.length === 0) return 0;
       const avgEarlyGames = earlyPlayers.reduce((sum, p) => sum + (p.games || 0), 0) / earlyPlayers.length;
 
       let elapsedHours = 1;
       const currentHourParsed = parseTimeRange(state.currentHourFilter);
-      if (currentHourParsed) {
-        elapsedHours = Math.max(1, currentHourParsed.start - totalParsed.start + 0.5);
+      const alignedCurrent = alignSubSlotToTotalTimeline(currentHourParsed, totalParsed);
+      if (alignedCurrent) {
+        elapsedHours = Math.max(0.5, alignedCurrent.start - totalParsed.start + 0.5);
       } else {
         const endedSlots = Object.keys(state.endedSubSlots || {}).filter(k => state.endedSubSlots[k]);
         if (endedSlots.length > 0) {
           const firstEnded = parseTimeRange(endedSlots[0]);
-          if (firstEnded) elapsedHours = Math.max(1, firstEnded.duration);
+          if (firstEnded) elapsedHours = Math.max(0.5, firstEnded.duration);
         }
       }
       return avgEarlyGames / elapsedHours;
@@ -2672,7 +2816,10 @@
       const playerParsed = parseTimeRange(player.timeSlot);
       if (!totalParsed || !playerParsed) return rawGames;
 
-      const missedStartHours = Math.max(0, playerParsed.start - totalParsed.start);
+      const alignedPlayer = alignSubSlotToTotalTimeline(playerParsed, totalParsed);
+      if (!alignedPlayer) return rawGames;
+
+      const missedStartHours = Math.max(0, alignedPlayer.start - totalParsed.start);
       let effective = rawGames;
 
       if (missedStartHours > 0) {
@@ -2684,11 +2831,12 @@
       const anySubSlotEnded = Object.values(state.endedSubSlots || {}).some(Boolean);
       const inLateHourFilter = (() => {
         const f = parseTimeRange(state.currentHourFilter);
-        return f && f.start > totalParsed.start;
+        const af = alignSubSlotToTotalTimeline(f, totalParsed);
+        return af && af.start > totalParsed.start + 0.001;
       })();
 
-      if ((anySubSlotEnded || inLateHourFilter) && playerParsed.duration < totalParsed.duration && playerParsed.start > totalParsed.start) {
-        const durationRatio = totalParsed.duration / playerParsed.duration;
+      if ((anySubSlotEnded || inLateHourFilter) && alignedPlayer.duration < totalParsed.duration && alignedPlayer.start > totalParsed.start + 0.001) {
+        const durationRatio = totalParsed.duration / alignedPlayer.duration;
         const ratioScaled = rawGames * durationRatio;
         effective = Math.max(effective, (effective + ratioScaled) / 2);
       }
@@ -4734,13 +4882,13 @@
           return `<button onclick="setRosterFilter('${t.key}')" class="roster-tab px-2.5 py-1 rounded-lg text-xs font-bold whitespace-nowrap transition ${active ? 'bg-emerald-500 text-slate-950 shadow' : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'}">${escapeHTML(t.label)}</button>`;
         }).join('');
       }
-
-      // 2. Render dynamic Early-Ending SubSlot Time-Up Buttons (e.g. 18-20時間到結束)
+      // 2. Render dynamic Early-Ending SubSlot Time-Up Buttons (supports overnight & half-hour slots)
       const earlyButtonsEl = document.getElementById('early-end-slot-buttons');
       if (earlyButtonsEl) {
         const earlySubSlots = configuredSlots.slice(1).filter(s => {
           const p = parseTimeRange(s);
-          return p && totalParsed && p.end < totalParsed.end;
+          const aligned = alignSubSlotToTotalTimeline(p, totalParsed);
+          return aligned && totalParsed && aligned.absEnd < totalParsed.absEnd - 0.001;
         });
 
         earlyButtonsEl.innerHTML = earlySubSlots.map(s => {
@@ -5278,7 +5426,7 @@
 
       container.innerHTML = slots.map((s, idx) => {
         const parsed = parseTimeRange(s);
-        const timeLabel = parsed ? `${parsed.start}:00 - ${parsed.end}:00` : s;
+        const timeLabel = parsed ? parsed.clockRange : s;
         const subLabel = idx === 0
           ? `全場 (${parsed ? parsed.duration + '小時' : '主時段'})`
           : `分時段 (${parsed ? parsed.duration + '小時' : '子時段'})`;
