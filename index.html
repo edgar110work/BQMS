@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>貓貓羽球排點系統｜台灣推廣1-15級・智慧排點管理</title>
+  <title>貓貓羽球排點系統 v0.0.2｜台灣推廣1-15級・通用智慧排點管理</title>
 
   <!-- ================= PWA / 桌面捷徑圖示與全螢幕 App 支援 ================= -->
   <meta name="theme-color" content="#0b1120" />
@@ -88,6 +88,21 @@
       position: relative;
       border: 2px solid rgba(167, 243, 208, 0.65);
       box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.35), 0 8px 20px -4px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Novice Court Surface & Glowing Card Style (When Novice Mode Enabled) */
+    .badminton-court-novice {
+      background: linear-gradient(145deg, #0e7490 0%, #0f766e 52%, #115e59 100%);
+      position: relative;
+      border: 2px solid rgba(190, 242, 100, 0.9);
+      box-shadow: inset 0 0 28px rgba(163, 230, 53, 0.22), 0 8px 22px -4px rgba(6, 182, 212, 0.4);
+      overflow: hidden;
+    }
+
+    .novice-court-card {
+      background: linear-gradient(165deg, rgba(20, 83, 45, 0.55) 0%, rgba(19, 78, 74, 0.5) 45%, rgba(15, 23, 42, 0.96) 100%);
+      border: 2px solid rgba(163, 230, 53, 0.75) !important;
+      box-shadow: 0 0 26px -4px rgba(163, 230, 53, 0.32), inset 0 1px 0 rgba(217, 249, 157, 0.25);
     }
 
     /* Court Net Line */
@@ -247,7 +262,7 @@
           class="px-2.5 h-9 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700/80 flex items-center justify-center gap-1.5 text-slate-300 transition active:scale-95"
           title="系統設定、版本資訊與重置">
           <i class="fa-solid fa-gear"></i>
-          <span id="header-version-badge" class="text-[10px] font-mono font-bold text-slate-400">v0.0.1</span>
+          <span id="header-version-badge" class="text-[10px] font-mono font-bold text-slate-400">v0.0.2</span>
         </button>
       </div>
     </div>
@@ -271,10 +286,10 @@
   <!-- ================= MAIN WORKSPACE (IPAD PRO LANDSCAPE 12-COL GRID) ================= -->
   <main class="flex-1 max-w-[1600px] w-full mx-auto p-3 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
 
-    <!-- LEFT / CENTER AREA (7 COLUMNS ON IPAD LANDSCAPE): DYNAMIC COURTS + PREPARATION QUEUE -->
+    <!-- LEFT / CENTER AREA (7 COLUMNS ON IPAD LANDSCAPE): DYNAMIC COURTS + EXPANDABLE PREPARATION QUEUE -->
     <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-5">
 
-      <!-- SECTION 1: DYNAMIC BADMINTON COURTS (DEFAULT 1, EXPANDABLE) -->
+      <!-- SECTION 1: DYNAMIC BADMINTON COURTS (DEFAULT 1, EXPANDABLE + FULL TEAM SWAP) -->
       <section>
         <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
           <div class="flex items-center gap-2 flex-wrap">
@@ -282,20 +297,27 @@
               <i class="fa-solid fa-table-tennis-paddle-ball text-emerald-400"></i>
               <span id="courts-section-title">場地即時看板（1面場地）</span>
             </h2>
-            <span class="text-xs text-slate-400 hidden sm:inline">點擊球員右上角「✕」可取消上場，或點擊格子互換位置</span>
+            <span class="text-xs text-slate-400 hidden xl:inline">點「✕」可單人取消上場；點「退回」優先退回準備區</span>
           </div>
 
-          <!-- Dynamic Court Add / Remove Controls -->
-          <div class="flex items-center gap-1.5">
-            <button onclick="removeLastCourt()" id="btn-remove-court"
-              class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-rose-950/70 border border-slate-700 hover:border-rose-500/40 text-slate-300 hover:text-rose-300 text-xs font-bold transition active:scale-95 disabled:opacity-40 disabled:pointer-events-none"
-              title="減少最後一面場地">
-              <i class="fa-solid fa-minus mr-1"></i>減少場地
-            </button>
-            <button onclick="addCourt()"
-              class="px-3 py-1 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-xs font-extrabold transition active:scale-95 flex items-center gap-1 shadow">
-              <i class="fa-solid fa-plus"></i>擴增場地
-            </button>
+          <div class="flex items-center gap-2 flex-wrap">
+            <!-- Dynamic Court Full-Team Swap Controls -->
+            <div id="courts-header-swap-controls" class="flex items-center gap-1.5 flex-wrap">
+              <!-- Dynamically rendered by JS when courts >= 2 -->
+            </div>
+
+            <!-- Dynamic Court Add / Remove Controls -->
+            <div class="flex items-center gap-1.5">
+              <button onclick="removeLastCourt()" id="btn-remove-court"
+                class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-rose-950/70 border border-slate-700 hover:border-rose-500/40 text-slate-300 hover:text-rose-300 text-xs font-bold transition active:scale-95 disabled:opacity-40 disabled:pointer-events-none"
+                title="減少最後一面場地">
+                <i class="fa-solid fa-minus mr-1"></i>減少場地
+              </button>
+              <button onclick="addCourt()"
+                class="px-3 py-1 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-xs font-extrabold transition active:scale-95 flex items-center gap-1 shadow">
+                <i class="fa-solid fa-plus"></i>擴增場地
+              </button>
+            </div>
           </div>
         </div>
 
@@ -305,7 +327,7 @@
         </div>
       </section>
 
-      <!-- SECTION 2: PREPARATION / STAGING AREA (排點準備區) -->
+      <!-- SECTION 2: PREPARATION / STAGING AREA (可擴增式多組排點準備區 + 排點綁定 + 新手場分流) -->
       <section class="bg-slate-900/90 border-2 border-indigo-500/40 rounded-2xl p-4 shadow-xl relative overflow-hidden">
         <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-800">
           <div class="flex items-center gap-2.5">
@@ -315,52 +337,97 @@
             </div>
             <div>
               <div class="flex items-center gap-2 flex-wrap">
-                <h2 class="text-base font-extrabold text-white">下一場排點準備區（4人同場即可）</h2>
+                <h2 id="prep-section-title" class="text-base font-extrabold text-white">下一場排點準備區（雙組預備・共 2 組 8 人）</h2>
                 <span id="prep-chemistry-badge"
                   class="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-semibold">
                   等待排點中
                 </span>
               </div>
-              <p class="text-xs text-slate-400">依設定之經營時段智慧加權，按「智慧自動配點」自動挑選最少同場打過的 4 人</p>
+              <p class="text-xs text-slate-400">可自由擴增/減少準備組數；第 1 組派上場後，後續組別自動往前遞補</p>
             </div>
           </div>
 
-          <!-- Action Buttons for Prep Area -->
-          <div class="flex items-center gap-2 flex-wrap">
-            <button onclick="autoFillPrepArea()"
-              class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-400 hover:to-violet-500 active:scale-95 text-white font-bold text-xs sm:text-sm shadow-lg shadow-indigo-950/60 flex items-center gap-1.5 transition">
-              <i class="fa-solid fa-bolt"></i>
-              智慧自動配點
+          <!-- Action Buttons for Prep Groups (Expand/Shrink + Auto-Fill + Clear) -->
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <button onclick="removePrepGroupCount()" id="btn-remove-prep-group" title="減少一組準備區"
+              class="px-2 py-1.5 rounded-xl bg-slate-800 hover:bg-rose-950/60 border border-slate-700 hover:border-rose-500/40 text-slate-300 hover:text-rose-300 text-xs font-bold transition active:scale-95 disabled:opacity-40 disabled:pointer-events-none">
+              <i class="fa-solid fa-minus"></i> 組數
             </button>
-            <button onclick="clearPrepArea()" title="清空準備區"
+            <button onclick="addPrepGroupCount()" id="btn-add-prep-group" title="擴增一組準備區 (最多6組)"
+              class="px-2.5 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-300 text-xs font-extrabold transition active:scale-95">
+              <i class="fa-solid fa-plus"></i> 擴增準備組
+            </button>
+
+            <div id="prep-top-action-buttons" class="flex items-center gap-1.5 flex-wrap">
+              <button onclick="autoFillPrepArea()"
+                class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-400 hover:to-violet-500 active:scale-95 text-white font-bold text-xs sm:text-sm shadow-lg shadow-indigo-950/60 flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-bolt"></i>
+                智慧自動配點
+              </button>
+            </div>
+            <button onclick="clearPrepArea()" title="清空全部準備區"
               class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-rose-950/60 border border-slate-700 hover:border-rose-500/40 active:scale-95 text-slate-300 hover:text-rose-300 text-xs transition">
               <i class="fa-solid fa-eraser"></i>
-              清空
+              全清空
             </button>
           </div>
         </div>
 
-        <!-- Clean 4 Slots in Prep Area -->
-        <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-3">
-          <div class="flex items-center justify-between mb-2.5">
-            <span class="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
-              <i class="fa-solid fa-users-viewfinder"></i> 準備上場 4 位名單（上場後自行分邊）
-            </span>
-            <span id="prep-avg-stats" class="text-[11px] text-slate-400 font-medium">平均級數: -</span>
+        <!-- SMART MATCHING SETTINGS BAR: (1) BINDING GROUPS & (2) NOVICE COURT MODE -->
+        <div class="mb-3 bg-slate-950/90 border border-slate-800 rounded-xl p-2.5 flex flex-col gap-2">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <!-- Left: Binding Settings Control -->
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <button onclick="openBindingModal()"
+                class="px-2.5 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-extrabold text-xs flex items-center gap-1.5 transition active:scale-95">
+                <i class="fa-solid fa-link"></i>
+                排點綁定設定 (2-4人同場)
+              </button>
+              <div id="binding-status-bar" class="flex items-center gap-1.5 flex-wrap">
+                <!-- Rendered by JS -->
+              </div>
+            </div>
+
+            <!-- Right: Novice Court Mode Settings -->
+            <div class="flex items-center gap-2 flex-wrap">
+              <button id="novice-mode-toggle-btn" onclick="toggleNoviceMode()"
+                class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs flex items-center gap-1.5 transition active:scale-95">
+                <i class="fa-solid fa-seedling text-emerald-400"></i>
+                <span>新手場分流：未啟用</span>
+              </button>
+              <div id="novice-level-config"
+                class="hidden items-center gap-1.5 bg-emerald-950/40 border border-emerald-500/30 rounded-xl px-2.5 py-1">
+                <label for="novice-max-level-select" class="text-[11px] font-bold text-emerald-300 whitespace-nowrap">
+                  新手等級(含)：
+                </label>
+                <select id="novice-max-level-select" onchange="setNoviceMaxLevel(this.value)"
+                  class="bg-slate-950 border border-emerald-500/40 rounded-lg px-2 py-0.5 text-xs font-extrabold text-emerald-200 focus:outline-none">
+                  <option value="1">≤ 1級 (新手)</option>
+                  <option value="2">≤ 2級 (新手)</option>
+                  <option value="3">≤ 3級 (新手)</option>
+                  <option value="4">≤ 4級 (初階)</option>
+                  <option value="5">≤ 5級 (初階)</option>
+                  <option value="6">≤ 6級 (中下)</option>
+                  <option value="7">≤ 7級 (中下)</option>
+                  <option value="8">≤ 8級 (中階)</option>
+                  <option value="9">≤ 9級 (中階)</option>
+                  <option value="10">≤ 10級 (中上)</option>
+                </select>
+                <span id="novice-pool-counts-hint" class="text-[10px] text-slate-400 hidden sm:inline"></span>
+              </div>
+            </div>
           </div>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5" id="prep-slots-grid">
-            <!-- Prep Slots 0, 1, 2, 3 rendered by JS -->
+
+          <!-- Active Binding Groups Quick Overview Strip -->
+          <div id="binding-groups-strip"
+            class="hidden pt-2 border-t border-slate-800/80 flex-wrap items-center gap-1.5 text-[11px]">
+            <!-- Rendered by JS -->
           </div>
         </div>
 
-        <!-- Dynamic Dispatch to Courts Bar -->
-        <div class="mt-3.5 pt-3 border-t border-slate-800/90 flex flex-wrap items-center justify-between gap-2">
-          <div id="prep-pair-history-hint" class="text-xs text-slate-400">
-            💡 提示：點擊任一位置即可與等待區球員替換
-          </div>
-          <div class="flex items-center gap-2 flex-wrap" id="prep-dispatch-buttons">
-            <!-- Dynamically rendered based on state.courts -->
-          </div>
+        <!-- Dynamic N Prep Groups Container -->
+        <div id="prep-groups-container" class="space-y-3">
+          <!-- Dynamically rendered by JS for 1..N prep groups -->
         </div>
       </section>
 
@@ -372,18 +439,20 @@
               class="fa-solid fa-layer-group text-emerald-400 mr-1"></i>台灣推廣分級色標：</span>
           <span
             class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">1-3級
-            新手階</span>
-          <span class="px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 border border-sky-500/30 font-semibold">4-6級
+            新手</span>
+          <span class="px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 border border-sky-500/30 font-semibold">4-5級
             初階</span>
+          <span class="px-2 py-0.5 rounded-md bg-teal-500/20 text-teal-300 border border-teal-500/30 font-semibold">6-7級
+            中下</span>
           <span
-            class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">7-9級
+            class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">8-9級
             中階</span>
           <span
-            class="px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold">10-12級
-            高階</span>
+            class="px-2 py-0.5 rounded-md bg-orange-500/20 text-orange-300 border border-orange-500/30 font-semibold">10-12級
+            中上</span>
           <span
-            class="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold">13-15級
-            職業/甲組</span>
+            class="px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold">13-15級
+            高階</span>
         </div>
         <div class="text-slate-400">
           點擊球員卡片即可檢視「<strong class="text-slate-200">今日總共跟誰打過幾次</strong>」
@@ -617,23 +686,26 @@
           <!-- 2A: Total Session Time Input -->
           <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 space-y-2.5">
             <div class="flex flex-wrap items-center justify-between gap-2">
-              <label class="text-xs font-extrabold text-white">1. 請輸入開團總時間（例如：<span class="text-emerald-300">18-21</span> 或 <span class="text-emerald-300">09-12</span>）</label>
-              <div class="flex items-center gap-1.5">
+              <label class="text-xs font-extrabold text-white">1. 請輸入開團總時間（支援過夜團與半點，如 <span class="text-emerald-300">18-21</span>、<span class="text-emerald-300">9.5-12.5</span>、<span class="text-emerald-300">23-03</span>）</label>
+              <div class="flex items-center gap-1.5 flex-wrap">
                 <span class="text-[11px] text-slate-400">快速範例：</span>
                 <button type="button" onclick="setWizardTotalTimePreset('18-21')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-emerald-300 font-bold border border-slate-700">18-21</button>
-                <button type="button" onclick="setWizardTotalTimePreset('19-22')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-emerald-300 font-bold border border-slate-700">19-22</button>
-                <button type="button" onclick="setWizardTotalTimePreset('14-17')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-emerald-300 font-bold border border-slate-700">14-17</button>
+                <button type="button" onclick="setWizardTotalTimePreset('9.5-12.5')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-emerald-300 font-bold border border-slate-700">9.5-12.5 (半點)</button>
+                <button type="button" onclick="setWizardTotalTimePreset('23-03')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-amber-300 font-bold border border-amber-500/40">23-03 (過夜團)</button>
               </div>
             </div>
 
             <div class="flex items-center gap-2.5 flex-wrap">
-              <input type="text" id="wiz-total-slot-input" value="18-21" placeholder="例如：18-21"
+              <input type="text" id="wiz-total-slot-input" value="18-21" placeholder="例如：18-21 或 23-03"
                 oninput="onWizardTotalSlotInput()"
-                class="w-36 bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-sm font-black text-emerald-300 tracking-wider text-center focus:outline-none focus:border-emerald-400" />
+                class="w-40 bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-sm font-black text-emerald-300 tracking-wider text-center focus:outline-none focus:border-emerald-400" />
               <span id="wiz-total-slot-parsed-hint" class="text-xs text-slate-300 font-semibold">
                 全場時段：18:00 - 21:00（共 3 小時）
               </span>
             </div>
+            <p class="text-[11px] text-slate-400">
+              💡 輸入提示：支援 <code class="text-slate-200">9.5</code> 或 <code class="text-slate-200">9:30</code> 代表 09:30；結束時間小於開始時間（如 <code class="text-amber-300">23-03</code>）會自動識別為跨夜隔日
+            </p>
           </div>
 
           <!-- 2B: Ask if there are different sub-timeslot operating modes -->
@@ -641,7 +713,7 @@
             <div class="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <div class="text-xs font-extrabold text-white">2. 是否有不同時段的經營模式？</div>
-                <div class="text-[11px] text-slate-400">例如總時間 18-21，另外開放球友報名半場時段（如 18-20、19-21）</div>
+                <div class="text-[11px] text-slate-400">例如總時間 18-21，另外開放半場時段（如 18-20、19.5-21）；過夜團 23-03 可設 23-01</div>
               </div>
               <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
                 <button type="button" onclick="setWizardSubSlotMode(false)" id="wiz-subslot-no"
@@ -656,9 +728,9 @@
             </div>
 
             <!-- Sub-Timeslot Adder (Visible when hasSubSlots === true) -->
-            <div id="wizard-subslots-editor" class="space-y-3 pt-2.5 border-t border-slate-800">
+            <div id="wizard-subslots-editor" class="hidden space-y-3 pt-2.5 border-t border-slate-800">
               <div class="flex flex-wrap items-center gap-2">
-                <input type="text" id="wiz-new-subslot-input" placeholder="輸入時段，例如 18-20 或 19-21"
+                <input type="text" id="wiz-new-subslot-input" placeholder="輸入時段，如 18-20、9.5-11.5 或 23-01"
                   onkeydown="if(event.key==='Enter'){event.preventDefault(); addWizardSubSlot();}"
                   class="flex-1 min-w-[180px] bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-indigo-400" />
                 <button type="button" onclick="addWizardSubSlot()"
@@ -667,16 +739,17 @@
                 </button>
                 <button type="button" onclick="quickFillSubSlotsFromTotal()"
                   class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sky-300 font-bold text-xs transition"
-                  title="依據總時間自動帶入前後半場時段（如 18-20 與 19-21）">
+                  title="依據總時間自動帶入前後半場時段（支援跨夜與小數點半小時）">
                   <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>自動帶入前後半場
                 </button>
               </div>
+            </div>
 
-              <div>
-                <div class="text-[11px] font-bold text-slate-400 mb-1.5">目前啟用的所有排點時段（系統將自動依時段長短與進場時間智慧加權排點）：</div>
-                <div id="wizard-subslots-list" class="flex flex-wrap gap-2">
-                  <!-- Dynamically rendered -->
-                </div>
+            <!-- Always visible: Currently Active Time Slots Preview (Dynamically synced with Total Time) -->
+            <div class="pt-2.5 border-t border-slate-800/80">
+              <div class="text-[11px] font-bold text-slate-400 mb-1.5">目前啟用的所有排點時段（自動依據上方「開團總時間」即時調整）：</div>
+              <div id="wizard-subslots-list" class="flex flex-wrap gap-2">
+                <!-- Dynamically rendered -->
               </div>
             </div>
           </div>
@@ -723,21 +796,22 @@
           <div class="flex items-center justify-between mb-1.5">
             <label class="text-xs font-bold text-slate-300">台灣推廣羽球分級 (1 - 15 級)</label>
             <span id="form-level-preview"
-              class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-              7級 (中階)
+              class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">
+              7級 (中下)
             </span>
           </div>
           <input type="range" id="form-player-level" min="1" max="15" value="7" oninput="updateLevelPreview(this.value)"
             class="w-full accent-emerald-500 cursor-pointer h-2 rounded-lg bg-slate-800" />
           <div class="flex justify-between text-[10px] text-slate-400 mt-1 px-0.5">
             <span>1-3 新手</span>
-            <span>4-6 初階</span>
-            <span>7-9 中階</span>
-            <span>10-12 高階</span>
-            <span>13-15 甲組</span>
+            <span>4-5 初階</span>
+            <span>6-7 中下</span>
+            <span>8-9 中階</span>
+            <span>10-12 中上</span>
+            <span>13-15 高階</span>
           </div>
           <!-- Quick Level Buttons -->
-          <div class="grid grid-cols-5 gap-1.5 mt-2">
+          <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 mt-2">
             <button type="button" onclick="setFormLevel(2)"
               class="py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-bold">2級
               新手</button>
@@ -745,13 +819,16 @@
               class="py-1 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-sky-300 text-xs font-bold">5級
               初階</button>
             <button type="button" onclick="setFormLevel(7)"
-              class="py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-bold">7級
+              class="py-1 rounded-lg bg-teal-500/15 hover:bg-teal-500/25 border border-teal-500/30 text-teal-300 text-xs font-bold">7級
               中下</button>
             <button type="button" onclick="setFormLevel(9)"
               class="py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-bold">9級
-              中上</button>
+              中階</button>
             <button type="button" onclick="setFormLevel(11)"
-              class="py-1 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-xs font-bold">11級
+              class="py-1 rounded-lg bg-orange-500/15 hover:bg-orange-500/25 border border-orange-500/30 text-orange-300 text-xs font-bold">11級
+              中上</button>
+            <button type="button" onclick="setFormLevel(14)"
+              class="py-1 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-xs font-bold">14級
               高階</button>
           </div>
         </div>
@@ -877,14 +954,15 @@
     </div>
   </div>
 
-  <!-- ================= MODAL 3: FINANCE & SHUTTLECOCK COST CALCULATOR ================= -->
+  <!-- ================= MODAL 3: DYNAMIC MULTI-TIMESLOT FINANCE & SHUTTLECOCK COST CALCULATOR ================= -->
   <div id="finance-modal"
     class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-5 shadow-2xl">
+    <div
+      class="bg-slate-900 border border-slate-700 rounded-2xl max-w-xl w-full p-5 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
         <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
           <i class="fa-solid fa-calculator text-emerald-400"></i>
-          繳費統計與獨立用球成本試算
+          分時段繳費統計與用球成本試算
         </h3>
         <button onclick="closeFinanceModal()"
           class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
@@ -893,24 +971,32 @@
       </div>
 
       <div class="space-y-4">
-        <!-- Unit Price Settings -->
-        <div class="grid grid-cols-2 gap-3">
-          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3">
-            <label class="block text-[11px] text-slate-400 mb-1">每人零打收費 (元)</label>
-            <input type="number" id="fin-fee-per-person" value="200" oninput="updateFinanceCalc()"
-              class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-sm font-bold text-emerald-300" />
+        <!-- Dynamic Time-Slot Price Settings (Adapts to user's configured session time & sub-slots) -->
+        <div>
+          <div class="text-xs font-bold text-slate-300 mb-2 flex items-center justify-between">
+            <span><i class="fa-regular fa-clock text-emerald-400 mr-1"></i>各經營時段每人零打收費設定 (元)</span>
+            <span class="text-[11px] text-slate-400 font-normal">依設定之時段自動產生・即時加總</span>
           </div>
-          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3">
-            <label class="block text-[11px] text-slate-400 mb-1">單顆羽球成本 (元/顆)</label>
-            <input type="number" id="fin-cost-per-shuttle" value="45" oninput="updateFinanceCalc()"
-              class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-sm font-bold text-amber-300" />
+          <div id="fin-dynamic-slot-cards" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <!-- Dynamically rendered by JS for every configured slot in state.sessionConfig -->
           </div>
+        </div>
+
+        <!-- Shuttle Cost Setting -->
+        <div
+          class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <label for="fin-cost-per-shuttle" class="block text-xs font-bold text-amber-300">🪶 單顆羽球成本 (元/顆)</label>
+            <span class="text-[11px] text-slate-400">今日已使用羽球顆數會自動乘以此單價</span>
+          </div>
+          <input type="number" id="fin-cost-per-shuttle" value="85" oninput="updateFinanceCalc(true)"
+            class="w-28 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-sm font-bold text-amber-300 text-right focus:outline-none focus:border-amber-400" />
         </div>
 
         <!-- Summary Cards -->
         <div class="grid grid-cols-3 gap-2.5 text-center">
           <div class="bg-slate-950 border border-slate-800 rounded-xl p-3">
-            <div class="text-[11px] text-slate-400">已收球費</div>
+            <div class="text-[11px] text-slate-400">各時段已收總和</div>
             <div id="fin-collected" class="text-base font-black text-emerald-400 mt-0.5">$0</div>
             <div id="fin-paid-count" class="text-[10px] text-slate-500">0人已繳</div>
           </div>
@@ -1022,7 +1108,134 @@
       <!-- Version Info Footer inside Gear Settings -->
       <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
         <span>目前系統版本號碼：</span>
-        <span id="settings-version-footer" class="font-mono font-bold text-slate-200">v0.0.1</span>
+        <span id="settings-version-footer" class="font-mono font-bold text-slate-200">v0.0.2</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 5B: PLAYER BINDING SETTINGS (排點綁定：單次綁定 / 全時段綁定) ================= -->
+  <div id="binding-modal"
+    class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div
+      class="bg-slate-900 border border-amber-500/40 rounded-2xl max-w-2xl w-full p-5 shadow-2xl max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+        <div>
+          <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
+            <i class="fa-solid fa-link text-amber-400"></i>
+            排點綁定設定（2～4人同場：單次綁定 / 全時段綁定）
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">
+            當輪到某位綁定球友但其他綁定夥伴還在場上時，系統會先讓別人上場，等綁定人都在場下才一起排上場
+          </p>
+        </div>
+        <button onclick="closeBindingModal()"
+          class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto space-y-4 pr-1">
+        <!-- Master Activation Banner -->
+        <div id="binding-modal-status-banner"
+          class="rounded-xl p-3 border flex flex-wrap items-center justify-between gap-2">
+          <!-- Rendered by JS -->
+        </div>
+
+        <!-- Create New Binding Group Box -->
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="text-xs font-extrabold text-amber-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-user-group"></i> 新增一組同場綁定（請點選 2 ～ 4 位已到場球友・依程度強→弱排列）
+            </span>
+            <span id="binding-selected-count-badge"
+              class="text-[11px] px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-bold">
+              已選 0 / 4 人
+            </span>
+          </div>
+
+          <!-- Mode Selector: ONCE vs FULL -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <label class="cursor-pointer">
+              <input type="radio" name="binding-mode-radio" value="ONCE" checked class="peer sr-only" />
+              <div
+                class="p-2.5 rounded-xl border border-slate-800 bg-slate-900/70 peer-checked:bg-sky-500/20 peer-checked:border-sky-400 peer-checked:text-sky-200 text-slate-300 transition">
+                <div class="text-xs font-extrabold flex items-center gap-1.5">
+                  <i class="fa-solid fa-1 text-sky-400"></i> 單次綁定（一次性同場）
+                </div>
+                <div class="text-[10px] opacity-80 mt-0.5">
+                  只要這幾人都在場下時一起排上場打過 1 次，即自動完成並解除綁定
+                </div>
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="binding-mode-radio" value="FULL" class="peer sr-only" />
+              <div
+                class="p-2.5 rounded-xl border border-slate-800 bg-slate-900/70 peer-checked:bg-amber-500/20 peer-checked:border-amber-400 peer-checked:text-amber-200 text-slate-300 transition">
+                <div class="text-xs font-extrabold flex items-center gap-1.5">
+                  <i class="fa-solid fa-infinity text-amber-400"></i> 全時段綁定（整場同進退）
+                </div>
+                <div class="text-[10px] opacity-80 mt-0.5">
+                  整場活動智慧排點皆把他們當成同一組一起上場，絕不拆散
+                </div>
+              </div>
+            </label>
+          </div>
+
+          <!-- Arrived Players Multi-Select Grid (2-4 players) -->
+          <div id="binding-player-picker-grid"
+            class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 max-h-44 overflow-y-auto p-1">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- Novice vs Regular Pool Selector when Novice Mode is Enabled & Mixed Levels Selected -->
+          <div id="binding-draft-pool-selector-box" class="hidden">
+            <!-- Rendered dynamically by JS -->
+          </div>
+
+          <div class="flex items-center justify-end gap-2 pt-1">
+            <button type="button" onclick="clearBindingDraftSelection()"
+              class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition">
+              重選球員
+            </button>
+            <button type="button" onclick="addBindingGroupFromModal()"
+              class="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs shadow transition active:scale-95">
+              <i class="fa-solid fa-plus mr-1"></i>加入綁定清單
+            </button>
+          </div>
+        </div>
+
+        <!-- Existing Binding Groups List -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-slate-200">目前已建立的綁定組合清單：</span>
+            <button onclick="clearAllBindingGroups()"
+              class="text-[11px] text-rose-400 hover:text-rose-300 font-bold underline">
+              清空全部綁定
+            </button>
+          </div>
+          <div id="binding-groups-modal-list" class="space-y-2">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer: Explicit User Confirmation to Activate / Deactivate for Smart Matching -->
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-3.5 mt-3 border-t border-slate-800">
+        <button type="button" onclick="deactivateBindings()"
+          class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-rose-950/60 border border-slate-700 hover:border-rose-500/40 text-slate-300 hover:text-rose-300 text-xs font-bold transition">
+          <i class="fa-solid fa-pause mr-1"></i>暫停綁定（智慧排點暫不參考）
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeBindingModal()"
+            class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition">
+            關閉
+          </button>
+          <button type="button" onclick="confirmAndActivateBindings()"
+            class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-emerald-950/60 transition active:scale-95 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-check"></i>
+            確認設定生效（讓智慧排點系統參考）
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -1198,6 +1411,33 @@
     </div>
   </div>
 
+  <!-- ================= MODAL 8: CONFIRM DELETE PLAYER MODAL ================= -->
+  <div id="delete-confirm-modal"
+    class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4"
+    onclick="closeDeleteConfirmModal()">
+    <div class="bg-slate-900 border border-rose-500/40 rounded-2xl max-w-sm w-full p-5 shadow-2xl text-center relative"
+      onclick="event.stopPropagation()">
+      <div
+        class="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center mx-auto mb-3 text-xl">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3 class="text-lg font-black text-white">是否確認刪除球員資料？</h3>
+      <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+        您即將刪除球員「<span id="delete-confirm-player-name" class="font-extrabold text-amber-300">-</span>」的報名與紀錄資料，刪除後將無法復原。
+      </p>
+      <div class="flex items-center justify-center gap-2.5 mt-5 pt-3.5 border-t border-slate-800">
+        <button type="button" onclick="closeDeleteConfirmModal()"
+          class="flex-1 py-2 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-xs transition active:scale-95">
+          取消
+        </button>
+        <button type="button" onclick="confirmDeletePlayer()"
+          class="flex-1 py-2 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs shadow-lg shadow-rose-950/60 transition active:scale-95 flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-trash-can"></i> 確認刪除
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= TOAST NOTIFICATION ================= -->
   <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
@@ -1206,12 +1446,12 @@
     /********************************************************************
      * 0. VERSION CONSTANT (可在這裡直接修改版本號碼)
      ********************************************************************/
-    const APP_VERSION = 'v0.0.1';
+    const APP_VERSION = 'v0.0.2';
 
     /********************************************************************
      * 1. STATE ARCHITECTURE & PRESERVED ICON / QR ASSETS
      ********************************************************************/
-    const STORAGE_KEY = 'MEOW_BADMINTON_UNIVERSAL_STATE_V1';
+    const STORAGE_KEY = 'MEOW_BADMINTON_UNIVERSAL_STATE_V2';
 
     const DEFAULT_CAT_SVG = `
       <svg viewBox="0 0 64 64" class="w-8 h-8" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1315,25 +1555,95 @@
       return !!(player && player.isHost);
     }
 
-    // Parse any "start-end" string like "18-21" into { raw: '18-21', start: 18, end: 21, duration: 3 }
+    // Format numeric hour (e.g., 9.5 -> "9.5", 25 -> "01", 25.5 -> "1.5", 18 -> "18")
+    function formatHourToken(numVal) {
+      const wrapped = ((numVal % 24) + 24) % 24;
+      const rounded = Math.round(wrapped * 100) / 100;
+      if (Number.isInteger(rounded)) {
+        return rounded < 10 ? String(rounded) : String(rounded);
+      }
+      return String(rounded);
+    }
+
+    // Format numeric hour into HH:MM clock display (e.g., 9.5 -> "09:30", 25 -> "01:00 (隔日)")
+    function formatHourToClock(numVal, showNextDay = false) {
+      const isNextDay = numVal >= 24;
+      const wrapped = ((numVal % 24) + 24) % 24;
+      const hours = Math.floor(wrapped);
+      const mins = Math.round((wrapped - hours) * 60);
+      const hh = String(hours).padStart(2, '0');
+      const mm = String(mins).padStart(2, '0');
+      return `${hh}:${mm}${showNextDay && isNextDay ? '(隔日)' : ''}`;
+    }
+
+    // Parse a single time token: supports "9", "09", "9.5", "9:30", "23.25", "23:15"
+    function parseSingleTimeToken(tokenStr) {
+      if (!tokenStr) return null;
+      const s = tokenStr.trim().replace(/：/g, ':');
+      if (s.includes(':')) {
+        const m = s.match(/^(\d{1,2}):(\d{1,2})$/);
+        if (!m) return null;
+        const h = parseInt(m[1], 10);
+        const min = parseInt(m[2], 10);
+        if (isNaN(h) || isNaN(min) || h < 0 || h > 24 || min < 0 || min >= 60) return null;
+        if (h === 24 && min > 0) return null;
+        return Math.round((h + min / 60) * 100) / 100;
+      }
+      const num = Number(s);
+      if (isNaN(num) || num < 0 || num > 24) return null;
+      return Math.round(num * 100) / 100;
+    }
+
+    // Parse any "start-end" string like "18-21", "9.5-12.5", "9:30-12:30", or overnight "23-03"
+    // Returns { raw, start, end, absEnd, duration, isOvernight, clockRange }
     function parseTimeRange(slotStr) {
       if (!slotStr || typeof slotStr !== 'string') return null;
       const cleaned = slotStr.trim().replace(/：/g, ':').replace(/～|~/g, '-');
-      const match = cleaned.match(/^(\d{1,2})(?::00)?\s*-\s*(\d{1,2})(?::00)?$/);
-      if (!match) return null;
-      const start = parseInt(match[1], 10);
-      const end = parseInt(match[2], 10);
-      if (isNaN(start) || isNaN(end) || start < 0 || end > 24 || end <= start) return null;
+      const parts = cleaned.split('-');
+      if (parts.length !== 2) return null;
+
+      const start = parseSingleTimeToken(parts[0]);
+      const end = parseSingleTimeToken(parts[1]);
+      if (start === null || end === null || start === end) return null;
+
+      // If end < start (e.g. 23-03 or 22.5-02), treat as overnight crossing midnight (+24h)
+      const isOvernight = end < start;
+      const absEnd = isOvernight ? end + 24 : end;
+      const duration = Math.round((absEnd - start) * 100) / 100;
+      if (duration <= 0 || duration > 24) return null;
+
+      // Preserve clean normalized token (pad single-digit integer end when overnight like 23-03 for readability)
+      const startTok = formatHourToken(start);
+      let endTok = formatHourToken(end);
+      if (isOvernight && Number.isInteger(end) && end < 10) {
+        endTok = '0' + end;
+      }
+
       return {
-        raw: `${start}-${end}`,
+        raw: `${startTok}-${endTok}`,
         start,
         end,
-        duration: end - start
+        absEnd,
+        duration,
+        isOvernight,
+        clockRange: `${formatHourToClock(start, false)} - ${formatHourToClock(absEnd, isOvernight)}`
       };
     }
 
+    // Align a sub-slot's start & absEnd onto the timeline of totalParsed (handles overnight wrap)
+    function alignSubSlotToTotalTimeline(subParsed, totalParsed) {
+      if (!subParsed || !totalParsed) return null;
+      let s = subParsed.start;
+      let e = subParsed.absEnd;
+      if (totalParsed.isOvernight && s < totalParsed.start) {
+        s += 24;
+        e += 24;
+      }
+      return { start: s, absEnd: e, duration: subParsed.duration };
+    }
+
     function getAllConfiguredSlots() {
-      const cfg = state.sessionConfig || { totalSlot: '18-21', hasSubSlots: true, subSlots: ['18-20', '19-21'] };
+      const cfg = state.sessionConfig || { totalSlot: '18-21', hasSubSlots: false, subSlots: [] };
       const total = cfg.totalSlot || '18-21';
       if (!cfg.hasSubSlots || !Array.isArray(cfg.subSlots) || cfg.subSlots.length === 0) {
         return [total];
@@ -1346,10 +1656,18 @@
     }
 
     function getHourlyPeriodsFromTotalSlot() {
-      const parsed = parseTimeRange(state.sessionConfig?.totalSlot || '18-21') || { start: 18, end: 21 };
+      const parsed = parseTimeRange(state.sessionConfig?.totalSlot || '18-21') || { start: 18, absEnd: 21 };
       const hours = [];
-      for (let h = parsed.start; h < parsed.end; h++) {
-        hours.push(`${h}-${h + 1}`);
+      let cursor = parsed.start;
+      while (cursor < parsed.absEnd - 0.001) {
+        const next = Math.min(parsed.absEnd, Math.round((cursor + 1) * 100) / 100);
+        const sTok = formatHourToken(cursor);
+        let eTok = formatHourToken(next);
+        if (next >= 24 && Number.isInteger(next % 24) && (next % 24) < 10) {
+          eTok = '0' + (next % 24);
+        }
+        hours.push(`${sTok}-${eTok}`);
+        cursor = next;
       }
       return hours;
     }
@@ -1361,22 +1679,22 @@
       const sub2 = allSlots[2] || sub1;
 
       const sample = [
-        { id: 'p1', name: '阿凱', level: 8, timeSlot: totalSlot, paid: true, checkedIn: true, games: 0, resting: false },
-        { id: 'p2', name: '小傑', level: 7, timeSlot: totalSlot, paid: true, checkedIn: true, games: 0, resting: false },
-        { id: 'p3', name: '瑋哥', level: 9, timeSlot: sub1, paid: true, checkedIn: true, games: 0, resting: false },
-        { id: 'p4', name: '阿哲', level: 6, timeSlot: totalSlot, paid: true, checkedIn: true, games: 0, resting: false },
-        { id: 'p5', name: '小美', level: 5, timeSlot: totalSlot, paid: true, checkedIn: true, games: 0, resting: false },
-        { id: 'p6', name: '庭庭', level: 4, timeSlot: sub1, paid: false, checkedIn: true, games: 0, resting: false },
-        { id: 'p7', name: '志豪', level: 6, timeSlot: totalSlot, paid: true, checkedIn: true, games: 0, resting: false },
-        { id: 'p8', name: '冠宇', level: 5, timeSlot: sub1, paid: true, checkedIn: true, games: 0, resting: false },
-        { id: 'p9', name: '大衛', level: 10, timeSlot: sub2, paid: true, checkedIn: true, games: 0, resting: false },
-        { id: 'p10', name: '柏翰', level: 9, timeSlot: totalSlot, paid: false, checkedIn: true, games: 0, resting: false },
-        { id: 'p11', name: '子軒', level: 8, timeSlot: sub2, paid: true, checkedIn: true, games: 0, resting: false },
-        { id: 'p12', name: '家豪', level: 7, timeSlot: totalSlot, paid: true, checkedIn: true, games: 0, resting: false },
-        { id: 'p13', name: '雅筑', level: 3, timeSlot: totalSlot, paid: true, checkedIn: true, games: 0, resting: false },
-        { id: 'p14', name: '心怡', level: 4, timeSlot: sub2, paid: false, checkedIn: false, games: 0, resting: false },
-        { id: 'p15', name: '建宏', level: 11, timeSlot: sub2, paid: true, checkedIn: false, games: 0, resting: false },
-        { id: 'p16', name: '品源', level: 6, timeSlot: totalSlot, paid: true, checkedIn: true, games: 0, resting: false },
+        { id: 'p1', name: '阿凱', level: 8, timeSlot: totalSlot, paid: true, checkedIn: true, games: 0, resting: false, tempBreak: false },
+        { id: 'p2', name: '小傑', level: 7, timeSlot: totalSlot, paid: true, checkedIn: true, games: 0, resting: false, tempBreak: false },
+        { id: 'p3', name: '瑋哥', level: 9, timeSlot: sub1, paid: true, checkedIn: true, games: 0, resting: false, tempBreak: false },
+        { id: 'p4', name: '阿哲', level: 6, timeSlot: totalSlot, paid: true, checkedIn: true, games: 0, resting: false, tempBreak: false },
+        { id: 'p5', name: '小美', level: 5, timeSlot: totalSlot, paid: true, checkedIn: true, games: 0, resting: false, tempBreak: false },
+        { id: 'p6', name: '庭庭', level: 4, timeSlot: sub1, paid: false, checkedIn: true, games: 0, resting: false, tempBreak: false },
+        { id: 'p7', name: '志豪', level: 6, timeSlot: totalSlot, paid: true, checkedIn: true, games: 0, resting: false, tempBreak: false },
+        { id: 'p8', name: '冠宇', level: 5, timeSlot: sub1, paid: true, checkedIn: true, games: 0, resting: false, tempBreak: false },
+        { id: 'p9', name: '大衛', level: 10, timeSlot: sub2, paid: true, checkedIn: true, games: 0, resting: false, tempBreak: false },
+        { id: 'p10', name: '柏翰', level: 9, timeSlot: totalSlot, paid: false, checkedIn: true, games: 0, resting: false, tempBreak: false },
+        { id: 'p11', name: '子軒', level: 8, timeSlot: sub2, paid: true, checkedIn: true, games: 0, resting: false, tempBreak: false },
+        { id: 'p12', name: '家豪', level: 7, timeSlot: totalSlot, paid: true, checkedIn: true, games: 0, resting: false, tempBreak: false },
+        { id: 'p13', name: '雅筑', level: 3, timeSlot: totalSlot, paid: true, checkedIn: true, games: 0, resting: false, tempBreak: false },
+        { id: 'p14', name: '心怡', level: 4, timeSlot: sub2, paid: false, checkedIn: false, games: 0, resting: false, tempBreak: false },
+        { id: 'p15', name: '建宏', level: 11, timeSlot: sub2, paid: true, checkedIn: false, games: 0, resting: false, tempBreak: false },
+        { id: 'p16', name: '品源', level: 6, timeSlot: totalSlot, paid: true, checkedIn: true, games: 0, resting: false, tempBreak: false },
       ];
       return sample.map(p => ({
         ...p,
@@ -1386,14 +1704,14 @@
       }));
     }
 
-    // Default state: 1 court, no hardcoded hosts, setupCompleted = false so first-time wizard launches
+    // Default state: 1 court, 2 prep groups (8 slots), no hardcoded hosts, setupCompleted = false so first-time wizard launches
     let state = {
       setupCompleted: false,
       noHostMode: false,
       sessionConfig: {
         totalSlot: '18-21',
-        hasSubSlots: true,
-        subSlots: ['18-20', '19-21']
+        hasSubSlots: false,
+        subSlots: []
       },
       customIconDataUrl: null,
       customIconPreset: 'DEFAULT_6796',
@@ -1403,25 +1721,78 @@
       courts: [
         { id: 1, name: '1號場', slots: [null, null, null, null], startTime: null }
       ],
-      prepSlots: [null, null, null, null],
+      prepGroupCount: 2,
+      prepSlots: [null, null, null, null, null, null, null, null],
       shuttlesUsed: 0,
       currentHourFilter: 'ALL',
       rosterFilter: 'ALL',
       regFilter: 'ALL',
       endedSubSlots: {}, // tracks which early-ending subSlots have been marked ended
+      bindingGroups: [],
+      bindingSystemActive: false,
+      noviceModeEnabled: false,
+      noviceMaxLevel: 4,
+      noviceLevelUserChanged: false,
+      slotFees: {
+        '18-21': 310,
+        '18-20': 220,
+        '19-21': 220
+      },
+      costPerShuttle: 85,
       matchLogs: []
     };
 
     let selectedSource = null;
+    let bindingDraftPlayerIds = [];
+    let bindingDraftTargetPool = null; // 'NOVICE' | 'REGULAR' | null
+    let pendingDeletePlayerId = null;
 
     // Temporary state for Setup Wizard Modal
     let wizardTemp = {
       noHostMode: false,
       hosts: [],
       totalSlot: '18-21',
-      hasSubSlots: true,
-      subSlots: ['18-20', '19-21']
+      hasSubSlots: false,
+      subSlots: []
     };
+
+    function normalizePrepSlotsArray() {
+      const groupCnt = Math.max(1, Math.min(6, Number(state.prepGroupCount) || 2));
+      state.prepGroupCount = groupCnt;
+      const targetLen = groupCnt * 4;
+      if (!Array.isArray(state.prepSlots)) {
+        state.prepSlots = new Array(targetLen).fill(null);
+      } else {
+        while (state.prepSlots.length < targetLen) state.prepSlots.push(null);
+        if (state.prepSlots.length > targetLen) state.prepSlots = state.prepSlots.slice(0, targetLen);
+      }
+    }
+
+    function getDefaultFeeForSlot(slotStr) {
+      if (state.slotFees && typeof state.slotFees[slotStr] === 'number') {
+        return state.slotFees[slotStr];
+      }
+      const parsed = parseTimeRange(slotStr);
+      if (parsed) {
+        if (parsed.duration >= 3) return 310;
+        if (parsed.duration === 2) return 220;
+        if (parsed.duration === 1) return 120;
+        return parsed.duration * 100;
+      }
+      return 250;
+    }
+
+    function ensureSlotFeesInitialized() {
+      if (!state.slotFees || typeof state.slotFees !== 'object') {
+        state.slotFees = {};
+      }
+      const allSlots = getAllConfiguredSlots();
+      allSlots.forEach(s => {
+        if (typeof state.slotFees[s] !== 'number') {
+          state.slotFees[s] = getDefaultFeeForSlot(s);
+        }
+      });
+    }
 
     /********************************************************************
      * 2. LOCAL STORAGE PERSISTENCE, ICON & QR CODE MANAGEMENT
@@ -1439,27 +1810,37 @@
           if (!state.sessionConfig || !state.sessionConfig.totalSlot) {
             state.sessionConfig = {
               totalSlot: '18-21',
-              hasSubSlots: true,
-              subSlots: ['18-20', '19-21']
+              hasSubSlots: false,
+              subSlots: []
             };
           }
           if (!Array.isArray(state.courts) || state.courts.length === 0) {
             state.courts = [{ id: 1, name: '1號場', slots: [null, null, null, null], startTime: null }];
           }
           if (!state.endedSubSlots) state.endedSubSlots = {};
+          if (!Array.isArray(state.bindingGroups)) state.bindingGroups = [];
+          if (typeof state.bindingSystemActive !== 'boolean') state.bindingSystemActive = false;
+          if (typeof state.noviceModeEnabled !== 'boolean') state.noviceModeEnabled = false;
+          if (!state.noviceMaxLevel || state.noviceMaxLevel < 1) state.noviceMaxLevel = 4;
+          if (typeof state.costPerShuttle !== 'number') state.costPerShuttle = 85;
+          normalizePrepSlotsArray();
+          ensureSlotFeesInitialized();
           state.players.forEach(p => {
             if (!p.playedWith) p.playedWith = {};
             if (typeof p.checkedIn !== 'boolean') p.checkedIn = true;
+            if (typeof p.tempBreak !== 'boolean') p.tempBreak = false;
             if (typeof p.isHost !== 'boolean') p.isHost = false;
           });
           saveState();
         } else {
-          // First time user: load sample players on 1 court and open setup wizard
+          // First time user: load sample players on 1 court and 2 prep groups, then open setup wizard
           state.players = getInitialDemoPlayers();
           state.courts = [
             { id: 1, name: '1號場', slots: ['p1', 'p2', 'p3', 'p4'], startTime: Date.now() - 180000 }
           ];
-          state.prepSlots = ['p5', 'p6', 'p7', 'p8'];
+          state.prepGroupCount = 2;
+          state.prepSlots = ['p5', 'p6', 'p7', 'p8', 'p10', 'p12', 'p16', 'p13'];
+          ensureSlotFeesInitialized();
           saveState();
         }
       } catch (e) {
@@ -1822,10 +2203,11 @@
         level: h.level || 7
       }));
       wizardTemp.totalSlot = state.sessionConfig?.totalSlot || '18-21';
-      wizardTemp.hasSubSlots = state.sessionConfig ? !!state.sessionConfig.hasSubSlots : true;
-      wizardTemp.subSlots = Array.isArray(state.sessionConfig?.subSlots)
+      // 首次開啟設定精靈（尚未完成設定）時，預設「是否有不同時段的經營模式？」固定為「無 (false)」
+      wizardTemp.hasSubSlots = state.setupCompleted && state.sessionConfig ? !!state.sessionConfig.hasSubSlots : false;
+      wizardTemp.subSlots = (state.setupCompleted && Array.isArray(state.sessionConfig?.subSlots))
         ? [...state.sessionConfig.subSlots]
-        : ['18-20', '19-21'];
+        : [];
 
       const totalInput = document.getElementById('wiz-total-slot-input');
       if (totalInput) totalInput.value = wizardTemp.totalSlot;
@@ -1903,16 +2285,35 @@
       const raw = document.getElementById('wiz-total-slot-input')?.value || '';
       const parsed = parseTimeRange(raw);
       const hint = document.getElementById('wiz-total-slot-parsed-hint');
+      const subInput = document.getElementById('wiz-new-subslot-input');
+
       if (parsed) {
         wizardTemp.totalSlot = parsed.raw;
         if (hint) {
           hint.className = 'text-xs text-emerald-300 font-bold';
-          hint.textContent = `✅ 全場時段：${parsed.start}:00 - ${parsed.end}:00（共 ${parsed.duration} 小時）`;
+          const overnightTag = parsed.isOvernight ? '🌙 跨夜團・' : '✅ ';
+          hint.textContent = `${overnightTag}全場時段：${parsed.clockRange}（共 ${parsed.duration} 小時）`;
+        }
+        // Filter out sub-slots that fall outside the updated total slot timeline
+        if (Array.isArray(wizardTemp.subSlots) && wizardTemp.subSlots.length > 0) {
+          wizardTemp.subSlots = wizardTemp.subSlots.filter(s => {
+            const sp = parseTimeRange(s);
+            const aligned = alignSubSlotToTotalTimeline(sp, parsed);
+            return aligned && aligned.start >= parsed.start - 0.001 && aligned.absEnd <= parsed.absEnd + 0.001 && sp.raw !== parsed.raw;
+          });
+        }
+        // Dynamically update sub-slot placeholder example based on current total time
+        if (subInput) {
+          const halfDur = Math.max(0.5, Math.round((parsed.duration * 2 / 3) * 2) / 2);
+          const ex1End = formatHourToken(parsed.start + halfDur);
+          const ex2Start = formatHourToken(parsed.absEnd - halfDur);
+          const ex2End = parsed.isOvernight && Number.isInteger(parsed.end) && parsed.end < 10 ? '0' + parsed.end : formatHourToken(parsed.end);
+          subInput.placeholder = `輸入時段，例如 ${formatHourToken(parsed.start)}-${ex1End} 或 ${ex2Start}-${ex2End}`;
         }
       } else {
         if (hint) {
           hint.className = 'text-xs text-rose-400 font-bold';
-          hint.textContent = `⚠️ 格式請輸入「開始-結束」(24小時制整點，如 18-21)`;
+          hint.textContent = `⚠️ 請輸入「開始-結束」(支援小數點如 9.5-12.5，或過夜團如 23-03)`;
         }
       }
       renderWizardSubSlotsList();
@@ -1927,13 +2328,16 @@
       const input = document.getElementById('wiz-new-subslot-input');
       const parsed = parseTimeRange(input?.value || '');
       if (!parsed) {
-        showToast('請輸入有效的時段格式，例如 18-20 或 19-21', 'warn');
+        showToast('請輸入有效的時段格式，例如 18-20、9.5-11.5 或 23-01', 'warn');
         return;
       }
       const totalParsed = parseTimeRange(wizardTemp.totalSlot);
-      if (totalParsed && (parsed.start < totalParsed.start || parsed.end > totalParsed.end)) {
-        showToast(`子時段 (${parsed.raw}) 需在開團總時間 (${totalParsed.raw}) 範圍內！`, 'warn');
-        return;
+      if (totalParsed) {
+        const aligned = alignSubSlotToTotalTimeline(parsed, totalParsed);
+        if (!aligned || aligned.start < totalParsed.start - 0.001 || aligned.absEnd > totalParsed.absEnd + 0.001) {
+          showToast(`子時段 (${parsed.clockRange}) 需在開團總時間 (${totalParsed.clockRange}) 範圍內！`, 'warn');
+          return;
+        }
       }
       if (parsed.raw === wizardTemp.totalSlot) {
         showToast(`全場時段 (${parsed.raw}) 已預設包含，請輸入其他子時段`, 'info');
@@ -1945,7 +2349,7 @@
       }
       input.value = '';
       renderWizardSubSlotsList();
-      showToast(`已新增經營時段：${parsed.raw}`, 'success');
+      showToast(`已新增經營時段：${parsed.raw}（${parsed.clockRange}）`, 'success');
     }
 
     function removeWizardSubSlot(slotStr) {
@@ -1955,21 +2359,34 @@
 
     function quickFillSubSlotsFromTotal() {
       const totalParsed = parseTimeRange(wizardTemp.totalSlot);
-      if (!totalParsed || totalParsed.duration < 2) {
-        showToast('總時段需至少 2 小時才能自動拆分前後時段', 'warn');
+      if (!totalParsed || totalParsed.duration < 1) {
+        showToast('總時段需至少 1 小時才能自動拆分前後時段', 'warn');
         return;
       }
       const generated = [];
-      if (totalParsed.duration === 3) {
-        generated.push(`${totalParsed.start}-${totalParsed.start + 2}`);
-        generated.push(`${totalParsed.start + 1}-${totalParsed.end}`);
+      const fmtEnd = (val) => {
+        const mod = ((val % 24) + 24) % 24;
+        if (totalParsed.isOvernight && Number.isInteger(mod) && mod < 10) return '0' + mod;
+        return formatHourToken(mod);
+      };
+
+      if (totalParsed.duration >= 3) {
+        // e.g. 18-21 -> 18-20 & 19-21; 23-03 (4h) -> 23-01 & 01-03; 9.5-12.5 (3h) -> 9.5-11.5 & 10.5-12.5
+        const subLen = totalParsed.duration === 3 ? 2 : Math.round((totalParsed.duration / 2) * 2) / 2;
+        const s1 = `${formatHourToken(totalParsed.start)}-${fmtEnd(totalParsed.start + subLen)}`;
+        const s2 = `${formatHourToken(totalParsed.absEnd - subLen)}-${fmtEnd(totalParsed.absEnd)}`;
+        generated.push(s1, s2);
       } else {
-        const mid = Math.floor((totalParsed.start + totalParsed.end) / 2);
-        generated.push(`${totalParsed.start}-${mid}`);
-        generated.push(`${mid}-${totalParsed.end}`);
+        const mid = Math.round(((totalParsed.start + totalParsed.absEnd) / 2) * 2) / 2;
+        const s1 = `${formatHourToken(totalParsed.start)}-${fmtEnd(mid)}`;
+        const s2 = `${formatHourToken(mid)}-${fmtEnd(totalParsed.absEnd)}`;
+        generated.push(s1, s2);
       }
+
       generated.forEach(s => {
-        if (!wizardTemp.subSlots.includes(s)) wizardTemp.subSlots.push(s);
+        if (s !== totalParsed.raw && !wizardTemp.subSlots.includes(s)) {
+          wizardTemp.subSlots.push(s);
+        }
       });
       renderWizardSubSlotsList();
       showToast(`已自動帶入子時段：${generated.join('、')}`, 'success');
@@ -2036,16 +2453,34 @@
     function renderWizardSubSlotsList() {
       const listEl = document.getElementById('wizard-subslots-list');
       if (!listEl) return;
-      const totalParsed = parseTimeRange(wizardTemp.totalSlot);
-      const totalChip = totalParsed
-        ? `<span class="px-3 py-1 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-extrabold">
-             全場時段：${totalParsed.raw} (${totalParsed.duration}小時)
-           </span>`
-        : '';
+      const rawInput = document.getElementById('wiz-total-slot-input')?.value || wizardTemp.totalSlot;
+      const totalParsed = parseTimeRange(rawInput) || parseTimeRange(wizardTemp.totalSlot);
 
-      const subChips = wizardTemp.subSlots.map(s => {
+      if (!totalParsed) {
+        listEl.innerHTML = `<span class="text-xs text-rose-400 font-semibold">請先於上方第 1 題輸入有效的開團總時間（例如 18-21、9.5-12.5 或 23-03）</span>`;
+        return;
+      }
+
+      const totalChip = `
+        <span class="px-3 py-1 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-extrabold">
+          全場時段：${totalParsed.raw}｜${totalParsed.clockRange} (${totalParsed.duration}小時)
+        </span>
+      `;
+
+      if (!wizardTemp.hasSubSlots) {
+        listEl.innerHTML = totalChip + `<span class="text-[11px] text-slate-400 self-center">（單一全場時段經營）</span>`;
+        return;
+      }
+
+      const validSubs = (wizardTemp.subSlots || []).filter(s => {
+        const sp = parseTimeRange(s);
+        const aligned = alignSubSlotToTotalTimeline(sp, totalParsed);
+        return aligned && aligned.start >= totalParsed.start - 0.001 && aligned.absEnd <= totalParsed.absEnd + 0.001 && sp.raw !== totalParsed.raw;
+      });
+
+      const subChips = validSubs.map(s => {
         const p = parseTimeRange(s);
-        const durText = p ? `${p.duration}小時` : '';
+        const durText = p ? `${p.clockRange}・${p.duration}小時` : '';
         return `
           <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-sky-500/20 border border-sky-500/40 text-sky-300 text-xs font-bold">
             <span>子時段：${escapeHTML(s)} ${durText ? `(${durText})` : ''}</span>
@@ -2056,16 +2491,32 @@
         `;
       }).join('');
 
-      listEl.innerHTML = totalChip + subChips;
+      const emptySubHint = validSubs.length === 0
+        ? `<span class="text-[11px] text-amber-300/90 self-center">尚未新增子時段，可於上方輸入或點「自動帶入前後半場」</span>`
+        : '';
+
+      listEl.innerHTML = totalChip + subChips + emptySubHint;
+    }
+    // Generalized eligibility check for any hourly period filter (supports overnight wrap & decimal half-hours)
+    function isPlayerEligibleInCurrentHour(player) {
+      if (!player) return false;
+      if (state.currentHourFilter === 'ALL') return true;
+      const totalRange = parseTimeRange(state.sessionConfig?.totalSlot || '18-21');
+      const filterRange = parseTimeRange(state.currentHourFilter);
+      const playerRange = parseTimeRange(player.timeSlot);
+      if (!filterRange || !playerRange) return true;
+
+      if (totalRange) {
+        const alignedFilter = alignSubSlotToTotalTimeline(filterRange, totalRange);
+        const alignedPlayer = alignSubSlotToTotalTimeline(playerRange, totalRange);
+        if (alignedFilter && alignedPlayer) {
+          return alignedPlayer.start <= alignedFilter.start + 0.001 && alignedPlayer.absEnd >= alignedFilter.absEnd - 0.001;
+        }
+      }
+      return playerRange.start <= filterRange.start + 0.001 && playerRange.absEnd >= filterRange.absEnd - 0.001;
     }
 
     function saveSetupWizard() {
-      const nameInput = document.getElementById('wiz-new-host-name');
-      if (!wizardTemp.noHostMode && nameInput && nameInput.value.trim()) {
-        // Automatically add typed host if user forgot to click "+ 加入團主"
-        addWizardHost();
-      }
-
       if (!wizardTemp.noHostMode && wizardTemp.hosts.length === 0) {
         showToast('請至少新增一位團主，若本次無團主請切換為「不要團主」！', 'warn');
         return;
@@ -2134,6 +2585,7 @@
       state.rosterFilter = 'ALL';
       state.regFilter = 'ALL';
       state.setupCompleted = true;
+      ensureSlotFeesInitialized();
 
       saveState();
       renderAll();
@@ -2146,7 +2598,7 @@
     }
 
     /********************************************************************
-     * 4. DYNAMIC COURTS MANAGEMENT (DEFAULT 1 COURT, EXPANDABLE)
+     * 4. DYNAMIC COURTS, COURT SWAPPING & EXPANDABLE PREP GROUPS
      ********************************************************************/
     function addCourt() {
       const nextNum = state.courts.length + 1;
@@ -2182,6 +2634,69 @@
       removeCourtByIndex(state.courts.length - 1);
     }
 
+    function swapCourts(courtIdxA, courtIdxB) {
+      const cA = state.courts[courtIdxA];
+      const cB = state.courts[courtIdxB];
+      if (!cA || !cB || courtIdxA === courtIdxB) return;
+
+      const hasAnyA = cA.slots.some(Boolean);
+      const hasAnyB = cB.slots.some(Boolean);
+      if (!hasAnyA && !hasAnyB) {
+        showToast(`${cA.name} 與 ${cB.name} 目前皆為空場，無須交換`, 'warn');
+        return;
+      }
+
+      const tempSlots = [...cA.slots];
+      const tempStart = cA.startTime;
+      cA.slots = [...cB.slots];
+      cA.startTime = cB.startTime;
+      cB.slots = tempSlots;
+      cB.startTime = tempStart;
+
+      clearSelection();
+      saveState();
+      renderAll();
+      showToast(`🔄 已將「${cA.name}」與「${cB.name}」全員交換場地！`, 'success');
+    }
+
+    function swapCourtsFromSelectors() {
+      const selA = document.getElementById('swap-court-select-a');
+      const selB = document.getElementById('swap-court-select-b');
+      if (!selA || !selB) return;
+      const idxA = parseInt(selA.value, 10);
+      const idxB = parseInt(selB.value, 10);
+      if (idxA === idxB) {
+        showToast('請選擇兩個不同的場地進行交換！', 'warn');
+        return;
+      }
+      swapCourts(idxA, idxB);
+    }
+
+    function addPrepGroupCount() {
+      if ((state.prepGroupCount || 2) >= 6) {
+        showToast('準備區最多可擴增至 6 組（24人）！', 'warn');
+        return;
+      }
+      state.prepGroupCount = (state.prepGroupCount || 2) + 1;
+      normalizePrepSlotsArray();
+      saveState();
+      renderAll();
+      showToast(`已擴增準備區為「共 ${state.prepGroupCount} 組 (${state.prepGroupCount * 4}人)」！`, 'success');
+    }
+
+    function removePrepGroupCount() {
+      if ((state.prepGroupCount || 2) <= 1) {
+        showToast('準備區至少需保留 1 組！', 'warn');
+        return;
+      }
+      state.prepGroupCount = (state.prepGroupCount || 2) - 1;
+      normalizePrepSlotsArray();
+      clearSelection();
+      saveState();
+      renderAll();
+      showToast(`已減少準備區為「共 ${state.prepGroupCount} 組 (${state.prepGroupCount * 4}人)」`, 'info');
+    }
+
     // Remove a single player from a court slot via the 'X' button
     function removeCourtSlotPlayer(event, courtIndex, slotIndex) {
       event.stopPropagation();
@@ -2190,7 +2705,7 @@
       const pid = court.slots[slotIndex];
       const player = getPlayerById(pid);
       court.slots[slotIndex] = null;
-      if (court.slots.filter(Boolean).length < 4) {
+      if (court.slots.every(s => !s)) {
         court.startTime = null;
       }
       clearSelection();
@@ -2202,7 +2717,7 @@
     }
 
     /********************************************************************
-     * 5. HELPER FUNCTIONS (SKILL LEVELS, DYNAMIC TIME SLOTS, LOCATIONS)
+     * 5. HELPER FUNCTIONS (6-TIER SKILL LEVELS, DYNAMIC TIME SLOTS, LOCATIONS)
      ********************************************************************/
     function getPlayerById(id) {
       if (!id) return null;
@@ -2213,14 +2728,16 @@
       const lv = Number(level) || 1;
       if (lv <= 3) {
         return { label: `${lv}級`, tier: '新手', classes: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' };
-      } else if (lv <= 6) {
+      } else if (lv <= 5) {
         return { label: `${lv}級`, tier: '初階', classes: 'bg-sky-500/20 text-sky-300 border-sky-500/40' };
+      } else if (lv <= 7) {
+        return { label: `${lv}級`, tier: '中下', classes: 'bg-teal-500/20 text-teal-300 border-teal-500/40' };
       } else if (lv <= 9) {
         return { label: `${lv}級`, tier: '中階', classes: 'bg-amber-500/20 text-amber-300 border-amber-500/40' };
       } else if (lv <= 12) {
-        return { label: `${lv}級`, tier: '高階', classes: 'bg-rose-500/20 text-rose-300 border-rose-500/40' };
+        return { label: `${lv}級`, tier: '中上', classes: 'bg-orange-500/20 text-orange-300 border-orange-500/40' };
       } else {
-        return { label: `${lv}級`, tier: '甲組', classes: 'bg-purple-500/20 text-purple-300 border-purple-500/40' };
+        return { label: `${lv}級`, tier: '高階', classes: 'bg-rose-500/20 text-rose-300 border-rose-500/40' };
       }
     }
 
@@ -2240,16 +2757,6 @@
       return { text: timeSlot || totalSlot, classes: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30' };
     }
 
-    // Generalized eligibility check for any hourly period filter (e.g. "18-19") and any player timeSlot (e.g. "18-20", "19-21")
-    function isPlayerEligibleInCurrentHour(player) {
-      if (!player) return false;
-      if (state.currentHourFilter === 'ALL') return true;
-      const filterRange = parseTimeRange(state.currentHourFilter);
-      const playerRange = parseTimeRange(player.timeSlot);
-      if (!filterRange || !playerRange) return true;
-      return playerRange.start <= filterRange.start && playerRange.end >= filterRange.end;
-    }
-
     function getPlayerLocation(playerId) {
       for (let c = 0; c < state.courts.length; c++) {
         const sIdx = state.courts[c].slots.indexOf(playerId);
@@ -2259,7 +2766,8 @@
       }
       const pIdx = state.prepSlots.indexOf(playerId);
       if (pIdx !== -1) {
-        return { status: 'PREP', slotIndex: pIdx, label: '準備區候命' };
+        const groupIdx = Math.floor(pIdx / 4);
+        return { status: 'PREP', slotIndex: pIdx, groupIndex: groupIdx, label: `準備區${groupIdx + 1}組` };
       }
       return { status: 'WAIT', label: '等待上場' };
     }
@@ -2272,37 +2780,35 @@
     }
 
     /********************************************************************
-     * 6. UNIVERSAL MULTI-TIMESLOT SMART AUTO-MATCHING ALGORITHM
+     * 6. UNIVERSAL MULTI-TIMESLOT SMART AUTO-MATCHING, BINDING & NOVICE MODE
      ********************************************************************/
-    // Compute average games per hour played so far by players who started from the beginning of the session
     function getSessionGamesPerHourRate() {
-      const totalParsed = parseTimeRange(state.sessionConfig?.totalSlot || '18-21') || { start: 18, end: 21, duration: 3 };
+      const totalParsed = parseTimeRange(state.sessionConfig?.totalSlot || '18-21') || { start: 18, absEnd: 21, duration: 3 };
       const earlyPlayers = state.players.filter(p => {
         if (isHostPlayer(p)) return false;
         if (!p.checkedIn && (p.games || 0) === 0) return false;
         const r = parseTimeRange(p.timeSlot);
-        return !r || r.start <= totalParsed.start;
+        const aligned = alignSubSlotToTotalTimeline(r, totalParsed);
+        return !aligned || aligned.start <= totalParsed.start + 0.001;
       });
       if (earlyPlayers.length === 0) return 0;
       const avgEarlyGames = earlyPlayers.reduce((sum, p) => sum + (p.games || 0), 0) / earlyPlayers.length;
 
-      // Estimate how many hours of play have elapsed based on ended early subSlots or currentHourFilter
       let elapsedHours = 1;
       const currentHourParsed = parseTimeRange(state.currentHourFilter);
-      if (currentHourParsed) {
-        elapsedHours = Math.max(1, currentHourParsed.start - totalParsed.start + 0.5);
+      const alignedCurrent = alignSubSlotToTotalTimeline(currentHourParsed, totalParsed);
+      if (alignedCurrent) {
+        elapsedHours = Math.max(0.5, alignedCurrent.start - totalParsed.start + 0.5);
       } else {
-        // Check if any early-ending sub-slot was marked finished
         const endedSlots = Object.keys(state.endedSubSlots || {}).filter(k => state.endedSubSlots[k]);
         if (endedSlots.length > 0) {
           const firstEnded = parseTimeRange(endedSlots[0]);
-          if (firstEnded) elapsedHours = Math.max(1, firstEnded.duration);
+          if (firstEnded) elapsedHours = Math.max(0.5, firstEnded.duration);
         }
       }
       return avgEarlyGames / elapsedHours;
     }
 
-    // Generalized Effective Games for any custom timeSlot (e.g., 18-21 vs 18-20 vs 19-21)
     function getPlayerEffectiveGames(player) {
       if (!player) return 0;
       const rawGames = player.games || 0;
@@ -2310,25 +2816,27 @@
       const playerParsed = parseTimeRange(player.timeSlot);
       if (!totalParsed || !playerParsed) return rawGames;
 
-      const missedStartHours = Math.max(0, playerParsed.start - totalParsed.start);
+      const alignedPlayer = alignSubSlotToTotalTimeline(playerParsed, totalParsed);
+      if (!alignedPlayer) return rawGames;
+
+      const missedStartHours = Math.max(0, alignedPlayer.start - totalParsed.start);
       let effective = rawGames;
 
-      // 1. Late-arrival baseline compensation (e.g. 19-21 missed 18-19)
       if (missedStartHours > 0) {
         const ratePerHour = getSessionGamesPerHourRate();
         const baselineOffset = missedStartHours * ratePerHour;
         effective += baselineOffset;
       }
 
-      // 2. Duration ratio calibration when entering final phase (e.g., 18-20 ended, calibrating 3h vs 2h ratio)
       const anySubSlotEnded = Object.values(state.endedSubSlots || {}).some(Boolean);
       const inLateHourFilter = (() => {
         const f = parseTimeRange(state.currentHourFilter);
-        return f && f.start > totalParsed.start;
+        const af = alignSubSlotToTotalTimeline(f, totalParsed);
+        return af && af.start > totalParsed.start + 0.001;
       })();
 
-      if ((anySubSlotEnded || inLateHourFilter) && playerParsed.duration < totalParsed.duration && playerParsed.start > totalParsed.start) {
-        const durationRatio = totalParsed.duration / playerParsed.duration; // e.g., 3 / 2 = 1.5
+      if ((anySubSlotEnded || inLateHourFilter) && alignedPlayer.duration < totalParsed.duration && alignedPlayer.start > totalParsed.start + 0.001) {
+        const durationRatio = totalParsed.duration / alignedPlayer.duration;
         const ratioScaled = rawGames * durationRatio;
         effective = Math.max(effective, (effective + ratioScaled) / 2);
       }
@@ -2374,114 +2882,877 @@
       };
     }
 
-    function autoFillPrepArea() {
-      const available = state.players.filter(p => {
-        if (isHostPlayer(p)) return false;
-        if (!p.checkedIn) return false;
-        if (p.resting) return false;
-        if (!isPlayerEligibleInCurrentHour(p)) return false;
-        const loc = getPlayerLocation(p.id);
-        return loc.status === 'WAIT' || loc.status === 'PREP';
+    // ================= BINDING GROUPS & NOVICE POOL LOGIC =================
+    function getActiveConfirmedBindingGroups() {
+      if (!state.bindingSystemActive) return [];
+      return (state.bindingGroups || []).filter(bg => {
+        if (!bg || !bg.enabled) return false;
+        const validIds = (bg.playerIds || []).filter(id => !!getPlayerById(id));
+        return validIds.length >= 2 && validIds.length <= 4;
       });
+    }
 
-      if (available.length < 4) {
-        showToast('目前「已到場」且符合時段、在等待區的球員不足 4 人！請先確認球員已報到或切換時段', 'warn');
+    function getPlayerBindingGroup(playerId, onlyActiveConfirmed = false) {
+      if (!playerId) return null;
+      const list = onlyActiveConfirmed ? getActiveConfirmedBindingGroups() : (state.bindingGroups || []);
+      return list.find(bg => bg && bg.enabled && (bg.playerIds || []).includes(playerId)) || null;
+    }
+
+    function areTwoPlayersInSameActiveBinding(idA, idB) {
+      const bg = getPlayerBindingGroup(idA, true);
+      if (!bg) return false;
+      return (bg.playerIds || []).includes(idB);
+    }
+
+    function analyzePlayerIdsNovicePool(playerIds) {
+      const maxLv = Number(state.noviceMaxLevel) || 4;
+      const members = (playerIds || []).map(id => getPlayerById(id)).filter(Boolean);
+      const noviceMembers = members.filter(m => (m.level || 1) <= maxLv);
+      const regularMembers = members.filter(m => (m.level || 1) > maxLv);
+      const hasNovice = noviceMembers.length > 0;
+      const hasRegular = regularMembers.length > 0;
+      const isMixed = hasNovice && hasRegular;
+      return {
+        maxLv,
+        noviceMembers,
+        regularMembers,
+        hasNovice,
+        hasRegular,
+        isMixed
+      };
+    }
+
+    function getBindingGroupLocationStatus(members) {
+      if (!members || members.length === 0) {
+        return { shortText: '全員場下待命', detailText: '🟢 全員場下待命', colorClass: 'text-emerald-300' };
+      }
+      const locInfos = members.map(m => getPlayerLocation(m.id));
+      const anyOnCourt = locInfos.some(loc => loc.status === 'COURT');
+      const allOnSameCourt = locInfos.every(loc => loc.status === 'COURT' && loc.courtIndex === locInfos[0].courtIndex);
+      const allInSamePrep = locInfos.every(loc => loc.status === 'PREP' && loc.groupIndex === locInfos[0].groupIndex);
+      const anyInPrep = locInfos.some(loc => loc.status === 'PREP');
+
+      if (allOnSameCourt) {
+        const courtName = state.courts[locInfos[0].courtIndex]?.name || '球場';
+        return {
+          shortText: '全員已在場上',
+          detailText: `🏸 全員已在場上（同在 ${courtName} 比賽中）`,
+          colorClass: 'text-cyan-300'
+        };
+      }
+      if (anyOnCourt) {
+        return {
+          shortText: '等待人員下場',
+          detailText: '⏳ 等待人員下場（綁定成員在不同場地或僅部分人在場上）',
+          colorClass: 'text-rose-300'
+        };
+      }
+      if (allInSamePrep) {
+        const prepGroupNum = (locInfos[0].groupIndex || 0) + 1;
+        return {
+          shortText: '全員準備區待命',
+          detailText: `🟣 全員準備區待命（同在準備區第 ${prepGroupNum} 組候命上場）`,
+          colorClass: 'text-indigo-300'
+        };
+      }
+      if (anyInPrep) {
+        return {
+          shortText: '部分準備區待命',
+          detailText: '🟣 部分準備區待命（沒人在場上，部分成員已在準備區）',
+          colorClass: 'text-indigo-300'
+        };
+      }
+      return {
+        shortText: '全員場下待命',
+        detailText: '🟢 全員場下待命（輪到時可一起排入準備區）',
+        colorClass: 'text-emerald-300'
+      };
+    }
+
+    function getBindingGroupEffectivePool(bg) {
+      if (!bg) return 'REGULAR';
+      if (bg.targetPool === 'NOVICE' || bg.targetPool === 'REGULAR') {
+        return bg.targetPool;
+      }
+      const info = analyzePlayerIdsNovicePool(bg.playerIds);
+      if (info.hasNovice && !info.hasRegular) return 'NOVICE';
+      return 'REGULAR';
+    }
+
+    function isPlayerInPoolType(player, poolType) {
+      if (!player) return false;
+      if (!poolType || poolType === 'ALL' || !state.noviceModeEnabled) return true;
+      const activeBg = getPlayerBindingGroup(player.id, true);
+      if (activeBg) {
+        return getBindingGroupEffectivePool(activeBg) === poolType;
+      }
+      const maxNoviceLv = Number(state.noviceMaxLevel) || 4;
+      if (poolType === 'NOVICE') {
+        return (player.level || 1) <= maxNoviceLv;
+      }
+      if (poolType === 'REGULAR') {
+        return (player.level || 1) > maxNoviceLv;
+      }
+      return true;
+    }
+
+    function toggleNoviceMode() {
+      state.noviceModeEnabled = !state.noviceModeEnabled;
+      saveState();
+      renderAll();
+      if (state.noviceModeEnabled) {
+        showToast(`🌱 已啟用「新手場分流」模式（預設新手等級 ≤ ${state.noviceMaxLevel} 級）！請選擇排新手或排普通(熟手)`, 'success');
+      } else {
+        showToast('已關閉「新手場分流」，恢復綜合智慧排點模式', 'info');
+      }
+    }
+
+    function setNoviceMaxLevel(val) {
+      const lv = Math.max(1, Math.min(15, parseInt(val, 10) || 4));
+      state.noviceMaxLevel = lv;
+      state.noviceLevelUserChanged = true;
+      saveState();
+      renderAll();
+      showToast(`🌱 新手等級上限已設定為「${lv} 級 (含) 以下」`, 'info');
+    }
+
+    function openBindingModal() {
+      bindingDraftPlayerIds = [];
+      bindingDraftTargetPool = null;
+      renderBindingModalContent();
+      const modal = document.getElementById('binding-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeBindingModal() {
+      const modal = document.getElementById('binding-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function setBindingDraftTargetPool(pool) {
+      bindingDraftTargetPool = pool;
+      renderBindingModalContent();
+    }
+
+    function toggleBindingDraftPlayer(playerId) {
+      const idx = bindingDraftPlayerIds.indexOf(playerId);
+      if (idx !== -1) {
+        bindingDraftPlayerIds.splice(idx, 1);
+      } else {
+        if (bindingDraftPlayerIds.length >= 4) {
+          showToast('單組綁定最多可選擇 4 位球員！', 'warn');
+          return;
+        }
+        const existingBg = (state.bindingGroups || []).find(bg => bg.enabled && (bg.playerIds || []).includes(playerId));
+        if (existingBg) {
+          const p = getPlayerById(playerId);
+          showToast(`「${p ? p.name : ''}」已在另一組啟用中的綁定名單內，請先刪除或停用原綁定`, 'warn');
+          return;
+        }
+        bindingDraftPlayerIds.push(playerId);
+      }
+      const poolInfo = analyzePlayerIdsNovicePool(bindingDraftPlayerIds);
+      if (!poolInfo.isMixed) {
+        bindingDraftTargetPool = null;
+      }
+      renderBindingModalContent();
+    }
+
+    function clearBindingDraftSelection() {
+      bindingDraftPlayerIds = [];
+      bindingDraftTargetPool = null;
+      renderBindingModalContent();
+    }
+
+    function addBindingGroupFromModal() {
+      if (bindingDraftPlayerIds.length < 2 || bindingDraftPlayerIds.length > 4) {
+        showToast('請點選 2 ～ 4 位想要一起同場打球的球員！', 'warn');
+        return;
+      }
+      const radios = document.getElementsByName('binding-mode-radio');
+      let mode = 'ONCE';
+      radios.forEach(r => { if (r.checked) mode = r.value; });
+
+      const poolInfo = analyzePlayerIdsNovicePool(bindingDraftPlayerIds);
+      let targetPool = bindingDraftTargetPool;
+
+      if (state.noviceModeEnabled && poolInfo.isMixed && !targetPool) {
+        showToast(
+          `⚠️ 此綁定群組同時包含「新手組(≤${poolInfo.maxLv}級)」與「普通組(>${poolInfo.maxLv}級)」球員！請先點選下方按鈕選擇要排在【新手組】還是【普通組】`,
+          'warn'
+        );
+        const box = document.getElementById('binding-draft-pool-selector-box');
+        if (box) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
 
-      available.sort((a, b) => {
-        const effA = getPlayerEffectiveGames(a);
-        const effB = getPlayerEffectiveGames(b);
-        if (Math.abs(effA - effB) > 0.05) return effA - effB;
-        return (a.lastPlayedAt || 0) - (b.lastPlayedAt || 0);
+      if (!targetPool) {
+        targetPool = (poolInfo.hasNovice && !poolInfo.hasRegular) ? 'NOVICE' : 'REGULAR';
+      }
+
+      const newGroup = {
+        id: 'bind_' + Date.now(),
+        playerIds: [...bindingDraftPlayerIds],
+        mode,
+        targetPool,
+        enabled: true,
+        completedOnce: false
+      };
+
+      if (!Array.isArray(state.bindingGroups)) state.bindingGroups = [];
+      state.bindingGroups.push(newGroup);
+      bindingDraftPlayerIds = [];
+      bindingDraftTargetPool = null;
+      saveState();
+      renderBindingModalContent();
+      renderAll();
+      const names = newGroup.playerIds.map(id => getPlayerById(id)?.name || '').filter(Boolean).join('、');
+      const poolText = state.noviceModeEnabled
+        ? `・歸類於【${targetPool === 'NOVICE' ? '🌱新手組' : '🔥普通組'}】`
+        : '';
+      showToast(
+        `已加入綁定「${names}」（${mode === 'FULL' ? '全時段綁定' : '單次綁定'}${poolText}）！請點右下角「確認設定生效」套用`,
+        'info'
+      );
+    }
+
+    function toggleBindingGroupTargetPool(groupId) {
+      const bg = (state.bindingGroups || []).find(g => g.id === groupId);
+      if (!bg) return;
+      const current = getBindingGroupEffectivePool(bg);
+      bg.targetPool = current === 'NOVICE' ? 'REGULAR' : 'NOVICE';
+      saveState();
+      renderBindingModalContent();
+      renderAll();
+      const names = (bg.playerIds || []).map(id => getPlayerById(id)?.name || '').filter(Boolean).join('、');
+      showToast(`已將綁定組「${names}」切換為排在【${bg.targetPool === 'NOVICE' ? '🌱 新手組區域' : '🔥 普通組區域'}】`, 'info');
+    }
+
+    function toggleBindingGroupEnabled(groupId) {
+      const bg = (state.bindingGroups || []).find(g => g.id === groupId);
+      if (!bg) return;
+      bg.enabled = !bg.enabled;
+      if (bg.enabled) {
+        bg.completedOnce = false;
+      }
+      saveState();
+      renderBindingModalContent();
+      renderAll();
+    }
+
+    function toggleBindingGroupMode(groupId) {
+      const bg = (state.bindingGroups || []).find(g => g.id === groupId);
+      if (!bg) return;
+      bg.mode = bg.mode === 'FULL' ? 'ONCE' : 'FULL';
+      saveState();
+      renderBindingModalContent();
+      renderAll();
+    }
+
+    function deleteBindingGroup(groupId) {
+      state.bindingGroups = (state.bindingGroups || []).filter(g => g.id !== groupId);
+      if (state.bindingGroups.length === 0) {
+        state.bindingSystemActive = false;
+      }
+      saveState();
+      renderBindingModalContent();
+      renderAll();
+      showToast('已刪除該組綁定設定', 'info');
+    }
+
+    function clearAllBindingGroups() {
+      state.bindingGroups = [];
+      state.bindingSystemActive = false;
+      bindingDraftPlayerIds = [];
+      bindingDraftTargetPool = null;
+      saveState();
+      renderBindingModalContent();
+      renderAll();
+      showToast('已清空所有排點綁定設定', 'info');
+    }
+
+    function confirmAndActivateBindings() {
+      const activeCount = (state.bindingGroups || []).filter(g => g.enabled && (g.playerIds || []).length >= 2).length;
+      if (activeCount === 0) {
+        showToast('目前尚無啟用中的綁定組合！請先點選 2~4 人並點「＋加入綁定清單」', 'warn');
+        return;
+      }
+      state.bindingSystemActive = true;
+      saveState();
+      renderBindingModalContent();
+      renderAll();
+      closeBindingModal();
+      showToast(`✅ 已確認生效！智慧排點系統現在會參考這 ${activeCount} 組綁定設定`, 'success');
+    }
+
+    function deactivateBindings() {
+      state.bindingSystemActive = false;
+      saveState();
+      renderBindingModalContent();
+      renderAll();
+      showToast('⏸ 已暫停排點綁定參考，智慧排點暫時以一般個人模式運作', 'info');
+    }
+
+    function renderBindingModalContent() {
+      const bannerEl = document.getElementById('binding-modal-status-banner');
+      const countBadge = document.getElementById('binding-selected-count-badge');
+      const pickerGrid = document.getElementById('binding-player-picker-grid');
+      const poolSelectorBox = document.getElementById('binding-draft-pool-selector-box');
+      const listEl = document.getElementById('binding-groups-modal-list');
+      if (!pickerGrid || !listEl) return;
+
+      const enabledGroups = (state.bindingGroups || []).filter(g => g.enabled);
+      const maxNoviceLv = Number(state.noviceMaxLevel) || 4;
+
+      if (bannerEl) {
+        if (state.bindingSystemActive && enabledGroups.length > 0) {
+          bannerEl.className = 'rounded-xl p-3 border bg-emerald-950/40 border-emerald-500/40 flex flex-wrap items-center justify-between gap-2';
+          bannerEl.innerHTML = `
+            <div class="flex items-center gap-2 text-xs font-extrabold text-emerald-300">
+              <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+              <span>目前狀態：【已確認生效】智慧排點正在參考 ${enabledGroups.length} 組綁定設定</span>
+            </div>
+            <span class="text-[11px] text-emerald-200/80">若綁定成員有人在場上，會先讓別人上場，等全員在場下才一起上</span>
+          `;
+        } else {
+          bannerEl.className = 'rounded-xl p-3 border bg-amber-950/30 border-amber-500/40 flex flex-wrap items-center justify-between gap-2';
+          bannerEl.innerHTML = `
+            <div class="flex items-center gap-2 text-xs font-extrabold text-amber-300">
+              <i class="fa-solid fa-triangle-exclamation text-amber-400 text-sm"></i>
+              <span>目前狀態：【尚未生效 / 已暫停】設定好綁定組合後，請按右下角「確認設定生效」才會讓智慧排點參考！</span>
+            </div>
+          `;
+        }
+      }
+
+      if (countBadge) {
+        countBadge.textContent = `已選 ${bindingDraftPlayerIds.length} / 4 人 (最少2人)`;
+        countBadge.className = `text-[11px] px-2.5 py-0.5 rounded-full font-bold border ${bindingDraftPlayerIds.length >= 2
+          ? 'bg-amber-500/20 text-amber-300 border-amber-400/50'
+          : 'bg-slate-800 text-slate-300 border-slate-700'
+          }`;
+      }
+
+      const eligiblePlayers = state.players
+        .filter(p => !isHostPlayer(p) && p.checkedIn && !p.resting)
+        .slice()
+        .sort((a, b) => {
+          if ((b.level || 0) !== (a.level || 0)) return (b.level || 0) - (a.level || 0);
+          return (a.name || '').localeCompare(b.name || '', 'zh-Hant');
+        });
+      if (eligiblePlayers.length === 0) {
+        pickerGrid.innerHTML = `<div class="col-span-full text-center py-4 text-xs text-slate-500">目前沒有已到場的一般球員可供綁定</div>`;
+      } else {
+        pickerGrid.innerHTML = eligiblePlayers.map(p => {
+          const isPicked = bindingDraftPlayerIds.includes(p.id);
+          const existingBg = (state.bindingGroups || []).find(bg => bg.enabled && (bg.playerIds || []).includes(p.id));
+          const lvInfo = getLevelBadgeInfo(p.level);
+          const isNovice = (p.level || 1) <= maxNoviceLv;
+          const poolTag = state.noviceModeEnabled
+            ? `<span class="text-[9px] px-1 rounded ${isNovice ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">${isNovice ? '新手組' : '普通組'}</span>`
+            : '';
+          return `
+            <button type="button" onclick="toggleBindingDraftPlayer('${p.id}')"
+                    class="p-2 rounded-xl border text-left flex items-center justify-between gap-1 transition ${isPicked
+              ? 'bg-amber-500/25 border-amber-400 text-white shadow'
+              : existingBg
+                ? 'bg-slate-900/40 border-slate-800 text-slate-500 opacity-60 cursor-not-allowed'
+                : 'bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-200'
+            }">
+              <div class="truncate">
+                <div class="text-xs font-extrabold truncate">${isPicked ? '✓ ' : ''}${escapeHTML(p.name)}</div>
+                <div class="text-[10px] text-slate-400 flex items-center gap-1">${escapeHTML(p.timeSlot)}・上${p.games}場 ${poolTag}</div>
+              </div>
+              <span class="text-[10px] px-1.5 py-0.2 rounded border font-bold shrink-0 ${lvInfo.classes}">${lvInfo.label}</span>
+            </button>
+          `;
+        }).join('');
+      }
+
+      if (poolSelectorBox) {
+        if (state.noviceModeEnabled && bindingDraftPlayerIds.length >= 2) {
+          const draftPoolInfo = analyzePlayerIdsNovicePool(bindingDraftPlayerIds);
+          poolSelectorBox.classList.remove('hidden');
+
+          if (draftPoolInfo.isMixed) {
+            const novNames = draftPoolInfo.noviceMembers.map(m => `${escapeHTML(m.name)}(${m.level}級)`).join('、');
+            const regNames = draftPoolInfo.regularMembers.map(m => `${escapeHTML(m.name)}(${m.level}級)`).join('、');
+            poolSelectorBox.className = 'rounded-xl p-3 border-2 border-amber-400/70 bg-amber-950/30 space-y-2';
+            poolSelectorBox.innerHTML = `
+              <div class="text-xs font-extrabold text-amber-300 flex items-start gap-1.5">
+                <i class="fa-solid fa-code-branch text-amber-400 mt-0.5"></i>
+                <div>
+                  <div>⚠️ 跨組別綁定確認（目前已啟用新手場分流 ≤${maxNoviceLv}級）：</div>
+                  <div class="text-[11px] text-slate-300 font-normal mt-0.5">
+                    此群組同時包含 <strong class="text-emerald-300">新手組：${novNames}</strong> 與 <strong class="text-amber-300">普通組：${regNames}</strong>，請選擇這群綁定球友要排在哪個區域：
+                  </div>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                <button type="button" onclick="setBindingDraftTargetPool('NOVICE')"
+                        class="py-2 px-3 rounded-xl border text-xs font-extrabold flex items-center justify-center gap-1.5 transition ${bindingDraftTargetPool === 'NOVICE'
+                ? 'bg-emerald-500 text-slate-950 border-emerald-300 shadow-lg'
+                : 'bg-slate-900 hover:bg-emerald-950/60 border-emerald-500/40 text-emerald-300'
+              }">
+                  <i class="fa-solid fa-seedling"></i>
+                  ${bindingDraftTargetPool === 'NOVICE' ? '✓ 已選：排在【新手場區域】' : '排在【新手場區域】(≤' + maxNoviceLv + '級)'}
+                </button>
+                <button type="button" onclick="setBindingDraftTargetPool('REGULAR')"
+                        class="py-2 px-3 rounded-xl border text-xs font-extrabold flex items-center justify-center gap-1.5 transition ${bindingDraftTargetPool === 'REGULAR'
+                ? 'bg-amber-500 text-slate-950 border-amber-300 shadow-lg'
+                : 'bg-slate-900 hover:bg-amber-950/60 border-amber-500/40 text-amber-300'
+              }">
+                  <i class="fa-solid fa-fire"></i>
+                  ${bindingDraftTargetPool === 'REGULAR' ? '✓ 已選：排在【普通場區域】' : '排在【普通場區域】(>' + maxNoviceLv + '級)'}
+                </button>
+              </div>
+            `;
+          } else {
+            const autoPool = draftPoolInfo.hasNovice ? 'NOVICE' : 'REGULAR';
+            const effectivePool = bindingDraftTargetPool || autoPool;
+            poolSelectorBox.className = 'rounded-xl p-2.5 border border-slate-800 bg-slate-900/60 flex flex-wrap items-center justify-between gap-2';
+            poolSelectorBox.innerHTML = `
+              <span class="text-[11px] text-slate-300">
+                🌱 新手場分流已啟用：所選球員皆為${autoPool === 'NOVICE' ? `新手組(≤${maxNoviceLv}級)` : `普通組(>${maxNoviceLv}級)`}，將排入
+                <strong class="${effectivePool === 'NOVICE' ? 'text-emerald-300' : 'text-amber-300'}">【${effectivePool === 'NOVICE' ? '新手場區域' : '普通場區域'}】</strong>
+              </span>
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="setBindingDraftTargetPool('${effectivePool === 'NOVICE' ? 'REGULAR' : 'NOVICE'}')"
+                        class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[10px] text-slate-300 font-bold">
+                  ⇄ 改排${effectivePool === 'NOVICE' ? '普通場' : '新手場'}
+                </button>
+              </div>
+            `;
+          }
+        } else {
+          poolSelectorBox.classList.add('hidden');
+          poolSelectorBox.innerHTML = '';
+        }
+      }
+
+      if (!state.bindingGroups || state.bindingGroups.length === 0) {
+        listEl.innerHTML = `<div class="text-center py-5 bg-slate-950/50 border border-dashed border-slate-800 rounded-xl text-xs text-slate-500">尚未建立任何排點綁定組合</div>`;
+      } else {
+        listEl.innerHTML = state.bindingGroups.map((bg, idx) => {
+          const members = (bg.playerIds || []).map(id => getPlayerById(id)).filter(Boolean);
+          const memberTags = members.map(m => {
+            const loc = getPlayerLocation(m.id);
+            const locText = loc.status === 'COURT' ? `(${loc.label})` : loc.status === 'PREP' ? `(${loc.label})` : '(場下等待)';
+            const lv = getLevelBadgeInfo(m.level);
+            return `<span class="px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-bold text-white inline-flex items-center gap-1">
+              ${escapeHTML(m.name)} <span class="text-[10px] px-1 rounded border ${lv.classes}">${lv.label}</span>
+              <span class="text-[10px] ${loc.status === 'WAIT' ? 'text-emerald-300' : 'text-amber-300'}">${locText}</span>
+            </span>`;
+          }).join('');
+
+          const locStatus = getBindingGroupLocationStatus(members);
+          const modeBadge = bg.mode === 'FULL'
+            ? `<span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-extrabold"><i class="fa-solid fa-infinity mr-1"></i>全時段綁定 (${members.length}人)</span>`
+            : `<span class="px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 border border-sky-500/40 text-[11px] font-extrabold"><i class="fa-solid fa-1 mr-1"></i>單次綁定 (${members.length}人)</span>`;
+
+          const effPool = getBindingGroupEffectivePool(bg);
+          const poolInfo = analyzePlayerIdsNovicePool(bg.playerIds);
+          const poolBadgeHTML = (state.noviceModeEnabled || poolInfo.isMixed)
+            ? `<span class="px-2 py-0.5 rounded-md border text-[11px] font-extrabold ${effPool === 'NOVICE'
+              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+              : 'bg-orange-500/20 text-orange-300 border-orange-500/40'
+            }">${effPool === 'NOVICE' ? '🌱 排入：新手組區域' : '🔥 排入：普通組區域'}</span>`
+            : '';
+
+          return `
+            <div class="bg-slate-950 border ${bg.enabled ? 'border-amber-500/40' : 'border-slate-800 opacity-60'} rounded-xl p-3 flex flex-col gap-2">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-xs font-black text-slate-400">#${idx + 1}</span>
+                  ${modeBadge}
+                  ${poolBadgeHTML}
+                  ${bg.completedOnce
+              ? `<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">✓ 已完成單次同場 (已解除)</span>`
+              : bg.enabled
+                ? `<span class="text-[11px] ${locStatus.colorClass} font-semibold">${locStatus.detailText}</span>`
+                : `<span class="text-[11px] text-slate-500">已停用</span>`
+            }
+                </div>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  ${(state.noviceModeEnabled || poolInfo.isMixed) ? `
+                    <button type="button" onclick="toggleBindingGroupTargetPool('${bg.id}')" title="切換此綁定組在新手場分流模式下要排在新手組還是普通組"
+                            class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-200 text-[11px] font-bold transition">
+                      ⇄ 改排${effPool === 'NOVICE' ? '普通組' : '新手組'}
+                    </button>
+                  ` : ''}
+                  <button type="button" onclick="toggleBindingGroupMode('${bg.id}')" title="切換單次綁定 / 全時段綁定"
+                          class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-[11px] font-bold transition">
+                    切換為${bg.mode === 'FULL' ? '單次' : '全時段'}
+                  </button>
+                  <button type="button" onclick="toggleBindingGroupEnabled('${bg.id}')"
+                          class="px-2.5 py-1 rounded-lg border text-[11px] font-bold transition ${bg.enabled
+              ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30'
+              : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'
+            }">
+                    ${bg.enabled ? '✓ 啟用中' : '已停用 (點此重新啟用)'}
+                  </button>
+                  <button type="button" onclick="deleteBindingGroup('${bg.id}')" title="刪除此綁定"
+                          class="w-7 h-7 rounded-lg bg-slate-900 hover:bg-rose-600 text-slate-400 hover:text-white border border-slate-700 flex items-center justify-center text-xs transition">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-1.5">${memberTags}</div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function pickBestQuartetFromCandidates(candidates, readyBindGroups = []) {
+      if (!candidates || candidates.length < 4) return null;
+
+      const playerBindMap = new Map();
+      const bindStatsMap = new Map();
+      readyBindGroups.forEach(bg => {
+        const members = candidates.filter(c => bg.playerIds.includes(c.id));
+        if (members.length === bg.playerIds.length) {
+          const avgEff = members.reduce((s, m) => s + getPlayerEffectiveGames(m), 0) / members.length;
+          const minLast = Math.min(...members.map(m => m.lastPlayedAt || 0));
+          bindStatsMap.set(bg.id, { avgEff, minLast });
+          members.forEach(m => playerBindMap.set(m.id, bg));
+        }
       });
 
-      const poolSize = Math.min(available.length, 10);
-      const pool = available.slice(0, poolSize);
+      const getSortEff = (p) => {
+        const bg = playerBindMap.get(p.id);
+        return bg ? bindStatsMap.get(bg.id).avgEff : getPlayerEffectiveGames(p);
+      };
+      const getSortLast = (p) => {
+        const bg = playerBindMap.get(p.id);
+        return bg ? bindStatsMap.get(bg.id).minLast : (p.lastPlayedAt || 0);
+      };
 
-      let bestQuartet = null;
-      let bestBalanceInfo = null;
-      let bestScore = Infinity;
+      const sortedCandidates = [...candidates].sort((a, b) => {
+        const effA = getSortEff(a);
+        const effB = getSortEff(b);
+        if (Math.abs(effA - effB) > 0.05) return effA - effB;
+        const bgA = playerBindMap.get(a.id)?.id || '';
+        const bgB = playerBindMap.get(b.id)?.id || '';
+        if (bgA !== bgB) return bgA.localeCompare(bgB);
+        return getSortLast(a) - getSortLast(b);
+      });
 
-      for (let i = 0; i < pool.length - 3; i++) {
-        for (let j = i + 1; j < pool.length - 2; j++) {
-          for (let k = j + 1; k < pool.length - 1; k++) {
-            for (let l = k + 1; l < pool.length; l++) {
-              const four = [pool[i], pool[j], pool[k], pool[l]];
-              const effSum =
-                getPlayerEffectiveGames(four[0]) +
-                getPlayerEffectiveGames(four[1]) +
-                getPlayerEffectiveGames(four[2]) +
-                getPlayerEffectiveGames(four[3]);
-              const gamesPenalty = effSum * 45;
-
-              let togetherRepeats = 0;
-              for (let a = 0; a < 4; a++) {
-                for (let b = a + 1; b < 4; b++) {
-                  togetherRepeats += getPlayedTogetherCount(four[a].id, four[b].id);
+      const buildAtomicPool = (maxLimit) => {
+        const pool = [];
+        const addedIds = new Set();
+        for (let i = 0; i < sortedCandidates.length; i++) {
+          const cand = sortedCandidates[i];
+          if (addedIds.has(cand.id)) continue;
+          const bg = playerBindMap.get(cand.id);
+          if (bg) {
+            const members = sortedCandidates.filter(c => bg.playerIds.includes(c.id));
+            if (pool.length + members.length <= maxLimit || pool.length < 4) {
+              members.forEach(m => {
+                if (!addedIds.has(m.id)) {
+                  pool.push(m);
+                  addedIds.add(m.id);
                 }
-              }
-              const repeatPenalty = togetherRepeats * 85;
+              });
+            }
+          } else {
+            if (pool.length < maxLimit) {
+              pool.push(cand);
+              addedIds.add(cand.id);
+            }
+          }
+        }
+        return pool;
+      };
 
-              const balanceInfo = evaluateQuartetSkillBalance(four);
-              const totalScore = gamesPenalty + repeatPenalty + balanceInfo.skillPenalty + (Math.random() * 2);
+      const searchInPool = (pool) => {
+        let bestQuartet = null;
+        let bestBalanceInfo = null;
+        let bestScore = Infinity;
 
-              if (totalScore < bestScore) {
-                bestScore = totalScore;
-                bestQuartet = balanceInfo.orderedIds;
-                bestBalanceInfo = balanceInfo;
+        for (let i = 0; i < pool.length - 3; i++) {
+          for (let j = i + 1; j < pool.length - 2; j++) {
+            for (let k = j + 1; k < pool.length - 1; k++) {
+              for (let l = k + 1; l < pool.length; l++) {
+                const four = [pool[i], pool[j], pool[k], pool[l]];
+                const fourIds = [four[0].id, four[1].id, four[2].id, four[3].id];
+
+                let violatesBinding = false;
+                for (let bIdx = 0; bIdx < readyBindGroups.length; bIdx++) {
+                  const bg = readyBindGroups[bIdx];
+                  let countInFour = 0;
+                  for (let mIdx = 0; mIdx < bg.playerIds.length; mIdx++) {
+                    if (fourIds.includes(bg.playerIds[mIdx])) countInFour++;
+                  }
+                  if (countInFour > 0 && countInFour < bg.playerIds.length) {
+                    violatesBinding = true;
+                    break;
+                  }
+                }
+                if (violatesBinding) continue;
+
+                const effSum =
+                  getSortEff(four[0]) +
+                  getSortEff(four[1]) +
+                  getSortEff(four[2]) +
+                  getSortEff(four[3]);
+                const gamesPenalty = effSum * 45;
+
+                let togetherRepeats = 0;
+                for (let a = 0; a < 4; a++) {
+                  for (let b = a + 1; b < 4; b++) {
+                    if (!areTwoPlayersInSameActiveBinding(four[a].id, four[b].id)) {
+                      togetherRepeats += getPlayedTogetherCount(four[a].id, four[b].id);
+                    }
+                  }
+                }
+                const repeatPenalty = togetherRepeats * 85;
+
+                const balanceInfo = evaluateQuartetSkillBalance(four);
+                const totalScore = gamesPenalty + repeatPenalty + balanceInfo.skillPenalty + (Math.random() * 2);
+
+                if (totalScore < bestScore) {
+                  bestScore = totalScore;
+                  bestQuartet = balanceInfo.orderedIds;
+                  bestBalanceInfo = balanceInfo;
+                }
               }
             }
           }
         }
+
+        if (!bestQuartet) return null;
+        return { orderedIds: bestQuartet, balanceInfo: bestBalanceInfo };
+      };
+
+      let found = searchInPool(buildAtomicPool(11));
+      if (!found && sortedCandidates.length > 11) {
+        found = searchInPool(sortedCandidates);
+      }
+      return found;
+    }
+
+    function autoFillPrepGroup(groupIndex, silent = false, poolType = 'ALL') {
+      normalizePrepSlotsArray();
+      const base = groupIndex * 4;
+
+      const baseAvailable = state.players.filter(p => {
+        if (isHostPlayer(p)) return false;
+        if (!p.checkedIn) return false;
+        if (p.resting) return false;
+        if (p.tempBreak) return false;
+        if (!isPlayerEligibleInCurrentHour(p)) return false;
+        if (!isPlayerInPoolType(p, poolType)) return false;
+        const loc = getPlayerLocation(p.id);
+        return loc.status === 'WAIT' || (loc.status === 'PREP' && loc.groupIndex === groupIndex);
+      });
+
+      const baseIdSet = new Set(baseAvailable.map(p => p.id));
+
+      const activeBinds = getActiveConfirmedBindingGroups();
+      const heldBackPlayerIds = new Set();
+      const readyBindGroups = [];
+
+      activeBinds.forEach(bg => {
+        const allReady = bg.playerIds.every(pid => baseIdSet.has(pid));
+        if (allReady) {
+          readyBindGroups.push(bg);
+        } else {
+          bg.playerIds.forEach(pid => heldBackPlayerIds.add(pid));
+        }
+      });
+
+      const available = baseAvailable.filter(p => !heldBackPlayerIds.has(p.id));
+
+      const poolLabel = poolType === 'NOVICE'
+        ? `【🌱新手場 ≤${state.noviceMaxLevel}級】`
+        : poolType === 'REGULAR'
+          ? `【🔥普通/熟手場 >${state.noviceMaxLevel}級】`
+          : '';
+
+      if (available.length < 4) {
+        if (!silent) {
+          const holdHint = heldBackPlayerIds.size > 0
+            ? '（部分綁定球友因夥伴尚在場上或不同分流池，暫緩等待全員到齊）'
+            : '';
+          showToast(`目前可排入「準備區第 ${groupIndex + 1} 組」${poolLabel}的球友不足 4 人！${holdHint}`, 'warn');
+        }
+        return null;
       }
 
-      if (bestQuartet) {
-        state.prepSlots = bestQuartet;
+      const result = pickBestQuartetFromCandidates(available, readyBindGroups);
+      if (!result) {
+        if (!silent) {
+          showToast(`無法湊出符合綁定人數限制的 4 人組合${poolLabel}，請檢查綁定設定或等待更多球友下場`, 'warn');
+        }
+        return null;
+      }
+
+      for (let i = 0; i < 4; i++) {
+        state.prepSlots[base + i] = result.orderedIds[i];
+      }
+      if (!silent) {
         clearSelection();
         saveState();
         renderAll();
-        const balanceLabel = bestBalanceInfo
-          ? `（${bestBalanceInfo.balanceType}：${bestBalanceInfo.teamASum}級 vs ${bestBalanceInfo.teamBSum}級）`
-          : '';
-        showToast(`已智慧配出 4 位球友${balanceLabel}！`, 'success');
+        const b = result.balanceInfo;
+        showToast(`已自動配好「準備區第 ${groupIndex + 1} 組」${poolLabel}（${b.balanceType}：${b.teamASum}級 vs ${b.teamBSum}級）！`, 'success');
       }
+      return result;
+    }
+
+    function autoFillPrepByPool(poolType) {
+      normalizePrepSlotsArray();
+      const totalGroups = state.prepGroupCount || 2;
+      const poolLabel = poolType === 'NOVICE'
+        ? `🌱 新手場 (≤${state.noviceMaxLevel}級)`
+        : `🔥 普通/熟手場 (>${state.noviceMaxLevel}級)`;
+
+      for (let g = 0; g < totalGroups; g++) {
+        const gFull = state.prepSlots.slice(g * 4, g * 4 + 4).filter(Boolean).length === 4;
+        if (!gFull) {
+          const res = autoFillPrepGroup(g, true, poolType);
+          if (!res) {
+            autoFillPrepGroup(g, false, poolType);
+            return;
+          }
+          clearSelection();
+          saveState();
+          renderAll();
+          showToast(`已依「${poolLabel}」自動配好【準備區第 ${g + 1} 組】（${res.balanceInfo.balanceType}）！`, 'success');
+          return;
+        }
+      }
+
+      // If all groups are full, refresh Group 1
+      state.prepSlots.splice(0, 4, null, null, null, null);
+      const res0 = autoFillPrepGroup(0, true, poolType);
+      if (!res0) {
+        autoFillPrepGroup(0, false, poolType);
+        return;
+      }
+      clearSelection();
+      saveState();
+      renderAll();
+      showToast(`已重新依「${poolLabel}」配好【準備區第 1 組】（${res0.balanceInfo.balanceType}）！`, 'success');
+    }
+
+    function autoFillPrepArea() {
+      normalizePrepSlotsArray();
+      const totalGroups = state.prepGroupCount || 2;
+
+      const allFull = Array.from({ length: totalGroups }, (_, g) =>
+        state.prepSlots.slice(g * 4, g * 4 + 4).filter(Boolean).length === 4
+      ).every(Boolean);
+
+      if (allFull) {
+        state.prepSlots = new Array(totalGroups * 4).fill(null);
+      }
+
+      let filledGroupsCount = 0;
+      for (let g = 0; g < totalGroups; g++) {
+        const isFull = state.prepSlots.slice(g * 4, g * 4 + 4).filter(Boolean).length === 4;
+        if (!isFull) {
+          const res = autoFillPrepGroup(g, true, 'ALL');
+          if (res) filledGroupsCount++;
+        } else {
+          filledGroupsCount++;
+        }
+      }
+
+      if (filledGroupsCount === 0) {
+        showToast('目前「已到場」且符合時段、在等待區的球員不足 4 人！請先確認球員已報到', 'warn');
+        return;
+      }
+
+      clearSelection();
+      saveState();
+      renderAll();
+      showToast(`✨ 已智慧配點完成（目前共備妥 ${filledGroupsCount} 組準備區）！`, 'success');
+    }
+
+    function clearPrepGroup(groupIndex) {
+      normalizePrepSlotsArray();
+      const base = groupIndex * 4;
+      for (let i = 0; i < 4; i++) {
+        state.prepSlots[base + i] = null;
+      }
+      clearSelection();
+      saveState();
+      renderAll();
+      showToast(`已清空準備區第 ${groupIndex + 1} 組`, 'info');
     }
 
     function clearPrepArea() {
-      state.prepSlots = [null, null, null, null];
+      normalizePrepSlotsArray();
+      state.prepSlots = new Array(state.prepGroupCount * 4).fill(null);
       clearSelection();
       saveState();
       renderAll();
+      showToast(`已清空全部準備區 (共 ${state.prepGroupCount} 組)`, 'info');
     }
 
     /********************************************************************
-     * 7. COURT MATCH EXECUTION & COMPLETION
+     * 7. COURT MATCH EXECUTION & COMPLETION (WITH BINDING & MULTI-PREP SHIFT)
      ********************************************************************/
-    function assignPrepToCourt(courtIndex) {
+    function assignPrepToCourt(courtIndex, preferredGroupIndex) {
+      normalizePrepSlotsArray();
       const court = state.courts[courtIndex];
       if (!court) return;
 
-      const readyIds = state.prepSlots.filter(Boolean);
-      if (readyIds.length < 4) {
-        showToast('準備區需排滿 4 位球員才能派發上場！', 'warn');
-        return;
-      }
-
       const courtOccupied = court.slots.some(Boolean);
       if (courtOccupied) {
-        showToast(`${court.name} 目前還有球員在場上，請先點擊「結束結算」或「退回」`, 'warn');
+        showToast(`${court.name} 目前還有球員在場上，請先點擊「結束結算」、「退回」或「場地交換」`, 'warn');
         return;
       }
 
-      court.slots = [...state.prepSlots];
-      court.startTime = Date.now();
-      state.prepSlots = [null, null, null, null];
+      const totalGroups = state.prepGroupCount || 2;
+      let targetGroup = typeof preferredGroupIndex === 'number' ? preferredGroupIndex : -1;
 
+      if (targetGroup === -1) {
+        for (let g = 0; g < totalGroups; g++) {
+          const gIds = state.prepSlots.slice(g * 4, g * 4 + 4);
+          if (gIds.filter(Boolean).length === 4) {
+            targetGroup = g;
+            break;
+          }
+        }
+      }
+
+      if (targetGroup < 0 || targetGroup >= totalGroups) {
+        showToast('準備區目前沒有排滿 4 人的組別可派發上場！', 'warn');
+        return;
+      }
+
+      const chosenIds = state.prepSlots.slice(targetGroup * 4, targetGroup * 4 + 4);
+      if (chosenIds.filter(Boolean).length < 4) {
+        showToast(`準備區「第 ${targetGroup + 1} 組」需排滿 4 位球員才能派發上場！`, 'warn');
+        return;
+      }
+
+      court.slots = [...chosenIds];
+      court.startTime = Date.now();
+
+      // Remove dispatched group and shift subsequent groups up automatically
+      state.prepSlots.splice(targetGroup * 4, 4);
+      state.prepSlots.push(null, null, null, null);
+
+      const shiftedAny = state.prepSlots.slice(targetGroup * 4).some(Boolean);
       clearSelection();
       saveState();
       renderAll();
-      showToast(`${court.name} 比賽開始！可點擊自動配點準備下一場`, 'success');
+      showToast(
+        shiftedAny
+          ? `${court.name} 比賽開始！後續準備組已自動往前遞補`
+          : `${court.name} 比賽開始！`,
+        'success'
+      );
     }
 
     function finishCourtMatch(courtIndex) {
@@ -2510,6 +3781,22 @@
         }
       }
 
+      // Check if any ONCE binding group completed its match together
+      let completedOnceLabels = [];
+      if (state.bindingSystemActive && Array.isArray(state.bindingGroups)) {
+        state.bindingGroups.forEach(bg => {
+          if (bg && bg.enabled && bg.mode === 'ONCE' && Array.isArray(bg.playerIds) && bg.playerIds.length >= 2) {
+            const allInMatch = bg.playerIds.every(pid => four.includes(pid));
+            if (allInMatch) {
+              bg.enabled = false;
+              bg.completedOnce = true;
+              const names = bg.playerIds.map(pid => getPlayerById(pid)?.name || '').filter(Boolean).join('、');
+              completedOnceLabels.push(names);
+            }
+          }
+        });
+      }
+
       state.matchLogs.unshift({
         id: 'm_' + now,
         courtName: court.name,
@@ -2523,18 +3810,59 @@
       clearSelection();
       saveState();
       renderAll();
-      showToast(`${court.name} 完賽結算！4位球員上場 +1 並已記錄同場球友`, 'success');
+      if (completedOnceLabels.length > 0) {
+        showToast(`${court.name} 完賽結算！單次綁定「${completedOnceLabels.join(' / ')}」已同場完賽並自動解除綁定`, 'success');
+      } else {
+        showToast(`${court.name} 完賽結算！4位球員上場 +1 並已記錄同場球友`, 'success');
+      }
     }
 
     function cancelCourtMatch(courtIndex) {
+      normalizePrepSlotsArray();
       const court = state.courts[courtIndex];
       if (!court) return;
+      const courtSlots = [...court.slots];
+      const activePlayers = courtSlots.filter(Boolean);
+      if (activePlayers.length === 0) return;
+
+      const totalGroups = state.prepGroupCount || 2;
+      let placedGroupIdx = -1;
+
+      for (let g = 0; g < totalGroups; g++) {
+        const gEmpty = state.prepSlots.slice(g * 4, g * 4 + 4).every(s => !s);
+        if (gEmpty) {
+          for (let i = 0; i < 4; i++) {
+            state.prepSlots[g * 4 + i] = courtSlots[i] || null;
+          }
+          placedGroupIdx = g;
+          break;
+        }
+      }
+
+      let destinationMsg = '';
+      if (placedGroupIdx !== -1) {
+        destinationMsg = `已將 ${court.name} 球員直接退回「準備區第 ${placedGroupIdx + 1} 組」（不計場次）`;
+      } else {
+        const emptyIndices = [];
+        for (let i = 0; i < state.prepSlots.length; i++) {
+          if (!state.prepSlots[i]) emptyIndices.push(i);
+        }
+        if (emptyIndices.length >= activePlayers.length) {
+          activePlayers.forEach((pid, idx) => {
+            state.prepSlots[emptyIndices[idx]] = pid;
+          });
+          destinationMsg = `已將 ${court.name} 球員退回「準備區空位」（不計場次）`;
+        } else {
+          destinationMsg = `準備區已滿，已將 ${court.name} 球員直接退回「等待區」（不計場次）`;
+        }
+      }
+
       court.slots = [null, null, null, null];
       court.startTime = null;
       clearSelection();
       saveState();
       renderAll();
-      showToast(`已將 ${court.name} 球員退回等待區（不計場次）`, 'info');
+      showToast(destinationMsg, 'info');
     }
 
     function recordPlayedTogether(id1, id2) {
@@ -2730,9 +4058,11 @@
       banner.classList.remove('hidden');
       if (selectedSource.type === 'PREP') {
         const p = getPlayerById(state.prepSlots[selectedSource.slotIndex]);
+        const gNum = Math.floor(selectedSource.slotIndex / 4) + 1;
+        const posNum = (selectedSource.slotIndex % 4) + 1;
         text.textContent = p
-          ? `已選取準備區的「${p.name}」，請點擊右側名單球員或另一位置進行替換`
-          : `已選取準備區空位 (第 ${selectedSource.slotIndex + 1} 格)，請點擊右側名單球員放入`;
+          ? `已選取準備區第 ${gNum} 組的「${p.name}」，請點擊右側名單球員或另一位置進行替換`
+          : `已選取準備區第 ${gNum} 組空位 (第 ${posNum} 格)，請點擊右側名單球員放入`;
       } else if (selectedSource.type === 'COURT') {
         const c = state.courts[selectedSource.courtIndex];
         const p = getPlayerById(c.slots[selectedSource.slotIndex]);
@@ -2793,6 +4123,8 @@
      * 10. RENDER ENGINE (HEADER, DYNAMIC COURTS, PREP, ROSTER, REG)
      ********************************************************************/
     function renderAll() {
+      normalizePrepSlotsArray();
+      ensureSlotFeesInitialized();
       renderVersionBadges();
       renderBrandIcon();
       renderHeaderStats();
@@ -2813,48 +4145,54 @@
 
       document.getElementById('completed-matches-badge').textContent = (state.matchLogs || []).length;
 
-      // Update session summary badge
+      // Update header session badge
       const sessionBadge = document.getElementById('header-session-badge');
       if (sessionBadge) {
         const allSlots = getAllConfiguredSlots();
-        sessionBadge.textContent = allSlots.length > 1
-          ? `時段 ${allSlots[0]} (含${allSlots.length - 1}子時段)`
-          : `時段 ${allSlots[0]}`;
+        sessionBadge.textContent = `開團 ${allSlots.join(' / ')}`;
       }
 
-      // Render dynamic hourly buttons in desktop & mobile bars
-      const hours = getHourlyPeriodsFromTotalSlot();
-      const allPeriods = ['ALL', ...hours];
+      // Render dynamic hourly period filter buttons on Desktop & Mobile
+      const hourlyPeriods = getHourlyPeriodsFromTotalSlot();
+      const allPeriods = ['ALL', ...hourlyPeriods];
 
-      const desktopBar = document.getElementById('desktop-period-bar');
-      if (desktopBar) {
-        desktopBar.innerHTML = `
-          <span class="text-xs text-slate-400 px-2 font-medium"><i class="fa-regular fa-clock mr-1 text-emerald-400"></i>現在時段：</span>
-          ${allPeriods.map(p => {
+      const dBar = document.getElementById('desktop-period-bar');
+      if (dBar) {
+        dBar.innerHTML = `<span class="text-xs text-slate-400 px-2 font-medium"><i class="fa-regular fa-clock mr-1 text-emerald-400"></i>現在時段：</span>` +
+          allPeriods.map(p => {
             const active = state.currentHourFilter === p;
             const label = p === 'ALL' ? '全部' : `${p}點`;
-            return `<button onclick="setCurrentHourFilter('${p}')" class="px-2.5 py-1 rounded-lg text-xs font-bold transition ${active ? 'bg-emerald-500 text-slate-950 shadow' : 'text-slate-300 hover:text-white'}">${label}</button>`;
-          }).join('')}
-        `;
+            return `<button onclick="setCurrentHourFilter('${p}')" class="period-btn px-2.5 py-1 rounded-lg text-xs font-bold transition ${active ? 'bg-emerald-500 text-slate-950 shadow' : 'text-slate-300 hover:text-white'}">${label}</button>`;
+          }).join('');
       }
 
-      const mobileBar = document.getElementById('mobile-period-bar');
-      if (mobileBar) {
-        mobileBar.innerHTML = `
-          <span class="text-xs text-slate-400 px-2 font-medium shrink-0"><i class="fa-regular fa-clock mr-1 text-emerald-400"></i>現在時段：</span>
-          <div class="flex gap-1">
-            ${allPeriods.map(p => {
-              const active = state.currentHourFilter === p;
-              const label = p === 'ALL' ? '全部' : p;
-              return `<button onclick="setCurrentHourFilter('${p}')" class="px-2 py-1 rounded-lg text-xs font-bold whitespace-nowrap transition ${active ? 'bg-emerald-500 text-slate-950 shadow' : 'text-slate-300'}">${label}</button>`;
-            }).join('')}
-          </div>
-        `;
+      const mBar = document.getElementById('mobile-period-bar');
+      if (mBar) {
+        mBar.innerHTML = `<span class="text-xs text-slate-400 px-2 font-medium shrink-0"><i class="fa-regular fa-clock mr-1 text-emerald-400"></i>時段：</span>` +
+          `<div class="flex gap-1 overflow-x-auto">` +
+          allPeriods.map(p => {
+            const active = state.currentHourFilter === p;
+            const label = p === 'ALL' ? '全部' : p;
+            return `<button onclick="setCurrentHourFilter('${p}')" class="m-period-btn px-2 py-1 rounded-lg text-xs font-bold whitespace-nowrap transition ${active ? 'bg-emerald-500 text-slate-950 shadow' : 'text-slate-300'}">${label}</button>`;
+          }).join('') +
+          `</div>`;
       }
+    }
+
+    function getGroupPoolClassification(players) {
+      if (!state.noviceModeEnabled) return 'NONE';
+      const nonHost = (players || []).filter(p => p && !isHostPlayer(p));
+      if (nonHost.length === 0) return 'NONE';
+      const noviceCount = nonHost.filter(p => isPlayerInPoolType(p, 'NOVICE')).length;
+      if (noviceCount === nonHost.length || (nonHost.length === 4 && noviceCount >= 3)) {
+        return 'NOVICE';
+      }
+      return 'REGULAR';
     }
 
     function renderCourts() {
       const count = state.courts.length;
+      const maxNoviceLv = Number(state.noviceMaxLevel) || 4;
       const titleEl = document.getElementById('courts-section-title');
       if (titleEl) {
         titleEl.textContent = `場地即時看板（${count}面場地）`;
@@ -2862,6 +4200,42 @@
       const removeBtn = document.getElementById('btn-remove-court');
       if (removeBtn) {
         removeBtn.disabled = count <= 1;
+      }
+
+      // Render dynamic header court swap controls when count >= 2
+      const swapControlsEl = document.getElementById('courts-header-swap-controls');
+      if (swapControlsEl) {
+        if (count < 2) {
+          swapControlsEl.innerHTML = '';
+        } else if (count <= 3) {
+          const pairs = [];
+          for (let i = 0; i < count; i++) {
+            for (let j = i + 1; j < count; j++) {
+              pairs.push([i, j]);
+            }
+          }
+          swapControlsEl.innerHTML = `
+            <span class="text-[11px] text-slate-400 font-bold"><i class="fa-solid fa-right-left text-sky-400 mr-1"></i>場地全員交換：</span>
+            ${pairs.map(([a, b]) => `
+              <button onclick="swapCourts(${a}, ${b})" title="將 ${state.courts[a].name} 與 ${state.courts[b].name} 的場上球員全員互換"
+                class="px-2.5 py-1 rounded-xl bg-sky-500/15 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 font-extrabold text-xs transition active:scale-95">
+                ${a + 1}號 ↔ ${b + 1}號
+              </button>
+            `).join('')}
+          `;
+        } else {
+          const optsA = state.courts.map((c, idx) => `<option value="${idx}" ${idx === 0 ? 'selected' : ''}>${escapeHTML(c.name)}</option>`).join('');
+          const optsB = state.courts.map((c, idx) => `<option value="${idx}" ${idx === 1 ? 'selected' : ''}>${escapeHTML(c.name)}</option>`).join('');
+          swapControlsEl.innerHTML = `
+            <div class="flex items-center gap-1 bg-slate-900 border border-slate-800 rounded-xl px-2 py-0.5">
+              <span class="text-[11px] text-slate-400 font-bold"><i class="fa-solid fa-right-left text-sky-400 mr-1"></i>交換：</span>
+              <select id="swap-court-select-a" class="bg-slate-950 border border-slate-700 rounded-lg px-1.5 py-0.5 text-xs text-sky-300 font-bold">${optsA}</select>
+              <span class="text-xs text-slate-400">↔</span>
+              <select id="swap-court-select-b" class="bg-slate-950 border border-slate-700 rounded-lg px-1.5 py-0.5 text-xs text-sky-300 font-bold">${optsB}</select>
+              <button onclick="swapCourtsFromSelectors()" class="px-2 py-0.5 rounded-lg bg-sky-500/20 hover:bg-sky-500/35 border border-sky-500/40 text-sky-300 font-extrabold text-xs transition">互換</button>
+            </div>
+          `;
+        }
       }
 
       const container = document.getElementById('courts-container');
@@ -2877,26 +4251,45 @@
         const playersOnCourt = court.slots.map(id => getPlayerById(id));
         const activeCount = playersOnCourt.filter(Boolean).length;
         const isFull = activeCount === 4;
+        const otherCourts = state.courts.map((_, idx) => idx).filter(idx => idx !== cIdx);
+        const courtPoolClass = getGroupPoolClassification(playersOnCourt);
+        const isNoviceCourt = courtPoolClass === 'NOVICE';
 
         return `
-          <div class="bg-slate-900/95 border border-slate-800 rounded-2xl p-3 flex flex-col justify-between shadow-lg">
+          <div class="${isNoviceCourt ? 'novice-court-card' : 'bg-slate-900/95 border border-slate-800'} rounded-2xl p-3 flex flex-col justify-between shadow-lg transition-all duration-300 relative overflow-hidden">
             <!-- Court Top Bar -->
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-0.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-black text-xs">
+            <div class="flex items-center justify-between gap-1 mb-2 relative z-10">
+              <div class="flex items-center gap-1.5 min-w-0 flex-wrap">
+                <span class="px-2 py-0.5 rounded-lg ${isNoviceCourt ? 'bg-lime-400/25 border border-lime-300/70 text-lime-200' : 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-300'} font-black text-xs shrink-0">
                   ${escapeHTML(court.name)}
                 </span>
+                ${isNoviceCourt
+            ? `<span class="px-2 py-0.5 rounded-lg bg-gradient-to-r from-lime-400 via-emerald-400 to-teal-300 text-slate-950 font-black text-[11px] shadow-md shadow-lime-500/30 flex items-center gap-1 shrink-0">
+                 <i class="fa-solid fa-seedling"></i> 新手場
+               </span>`
+            : (state.noviceModeEnabled && courtPoolClass === 'REGULAR')
+              ? `<span class="px-1.5 py-0.5 rounded-lg bg-amber-500/20 border border-amber-400/40 text-amber-300 font-extrabold text-[10px] flex items-center gap-1 shrink-0">
+                   <i class="fa-solid fa-fire"></i> 普通場
+                 </span>`
+              : ''
+          }
                 ${isFull
-            ? `<span class="text-[11px] font-bold text-amber-300 flex items-center gap-1">
-                        <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+            ? `<span class="text-[11px] font-bold ${isNoviceCourt ? 'text-lime-200' : 'text-amber-300'} flex items-center gap-1 shrink-0">
+                        <span class="w-2 h-2 rounded-full ${isNoviceCourt ? 'bg-lime-300' : 'bg-amber-400'} animate-ping"></span>
                         <span class="court-timer" data-start="${court.startTime || Date.now()}">${formatDuration(court.startTime)}</span>
                        </span>`
-            : `<span class="text-[11px] text-slate-400">空場待命 (${activeCount}/4)</span>`
+            : `<span class="text-[11px] text-slate-400 truncate">空場 (${activeCount}/4)</span>`
           }
               </div>
-              <div class="flex items-center gap-1">
-                <button onclick="adjustShuttles(1)" title="此場地換新球 (+1顆)" class="px-2 py-0.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/30 border border-amber-500/30 text-amber-300 text-[11px] font-bold transition active:scale-95">
-                  🪶+1球
+              <div class="flex items-center gap-1 shrink-0 flex-wrap justify-end">
+                ${otherCourts.slice(0, 3).map(oIdx => `
+                  <button onclick="swapCourts(${cIdx}, ${oIdx})" title="與 ${escapeHTML(state.courts[oIdx].name)} 全員交換場地"
+                          class="px-1.5 py-0.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/30 border border-sky-500/30 text-sky-300 text-[10px] font-bold transition active:scale-95">
+                    ⇄${oIdx + 1}場
+                  </button>
+                `).join('')}
+                <button onclick="adjustShuttles(1)" title="此場地換新球 (+1顆)" class="px-1.5 py-0.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/30 border border-amber-500/30 text-amber-300 text-[10px] font-bold transition active:scale-95">
+                  🪶+1
                 </button>
                 ${count > 1 ? `
                   <button onclick="removeCourtByIndex(${cIdx})" title="刪除此場地" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-rose-950 border border-slate-700 hover:border-rose-500/40 text-slate-400 hover:text-rose-300 flex items-center justify-center text-[10px] transition">
@@ -2906,35 +4299,47 @@
               </div>
             </div>
 
-            <!-- Green Court Visual Representation (4 Unified Slots with X cancel button) -->
-            <div class="badminton-court rounded-xl p-2.5 flex flex-col gap-2">
-              <div class="grid grid-cols-2 gap-1.5">
-                ${renderCourtSlotHTML(cIdx, 0, playersOnCourt[0])}
-                ${renderCourtSlotHTML(cIdx, 1, playersOnCourt[1])}
+            <!-- Court Visual Representation (4 Unified Slots + Novice Watermark & Theme) -->
+            <div class="${isNoviceCourt ? 'badminton-court-novice' : 'badminton-court'} rounded-xl p-2.5 flex flex-col gap-2 relative">
+              ${isNoviceCourt ? `
+                <div class="pointer-events-none select-none absolute inset-0 flex flex-col items-center justify-center opacity-20 z-0">
+                  <i class="fa-solid fa-seedling text-6xl text-lime-200"></i>
+                  <span class="text-xs font-black tracking-[0.25em] text-lime-100 mt-1">NOVICE 新手專場</span>
+                </div>
+              ` : ''}
+
+              <div class="grid grid-cols-2 gap-1.5 relative z-10">
+                ${renderCourtSlotHTML(cIdx, 0, playersOnCourt[0], isNoviceCourt)}
+                ${renderCourtSlotHTML(cIdx, 1, playersOnCourt[1], isNoviceCourt)}
               </div>
 
               <!-- Net Line -->
-              <div class="court-net my-0.5">
-                <span class="px-2 py-0.2 bg-emerald-950/90 border border-emerald-400/40 rounded-full text-[9px] font-black text-emerald-200 tracking-widest uppercase">
-                  NET 球網
-                </span>
+              <div class="court-net my-0.5 relative z-10">
+                ${isNoviceCourt
+            ? `<span class="px-2.5 py-0.5 bg-lime-950/95 border border-lime-300/80 rounded-full text-[10px] font-black text-lime-200 tracking-wider shadow-md flex items-center gap-1">
+                 <i class="fa-solid fa-seedling text-lime-300"></i> 新手歡樂場 (≤${maxNoviceLv}級)
+               </span>`
+            : `<span class="px-2 py-0.2 bg-emerald-950/90 border border-emerald-400/40 rounded-full text-[9px] font-black text-emerald-200 tracking-widest uppercase">
+                 NET 球網
+               </span>`
+          }
               </div>
 
-              <div class="grid grid-cols-2 gap-1.5">
-                ${renderCourtSlotHTML(cIdx, 2, playersOnCourt[2])}
-                ${renderCourtSlotHTML(cIdx, 3, playersOnCourt[3])}
+              <div class="grid grid-cols-2 gap-1.5 relative z-10">
+                ${renderCourtSlotHTML(cIdx, 2, playersOnCourt[2], isNoviceCourt)}
+                ${renderCourtSlotHTML(cIdx, 3, playersOnCourt[3], isNoviceCourt)}
               </div>
             </div>
 
             <!-- Court Bottom Controls -->
-            <div class="mt-2.5 flex items-center gap-1.5">
+            <div class="mt-2.5 flex items-center gap-1.5 relative z-10">
               ${activeCount > 0
             ? `
-                    <button onclick="finishCourtMatch(${cIdx})" ${!isFull ? 'disabled' : ''} class="flex-1 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 active:scale-95 text-slate-950 font-extrabold text-xs shadow transition flex items-center justify-center gap-1">
-                      <i class="fa-solid fa-flag-checkered"></i> 結束結算 (+1場)
+                    <button onclick="finishCourtMatch(${cIdx})" ${!isFull ? 'disabled' : ''} class="flex-1 py-2 rounded-xl ${isNoviceCourt ? 'bg-gradient-to-r from-lime-400 to-emerald-400 hover:from-lime-300 hover:to-emerald-300' : 'bg-emerald-500 hover:bg-emerald-400'} disabled:opacity-40 active:scale-95 text-slate-950 font-extrabold text-xs shadow transition flex items-center justify-center gap-1">
+                      <i class="fa-solid fa-flag-checkered"></i> ${isNoviceCourt ? '新手場結算 (+1場)' : '結束結算 (+1場)'}
                     </button>
-                    <button onclick="cancelCourtMatch(${cIdx})" title="不計場次將場上全體退回等待區" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
-                      全退回
+                    <button onclick="cancelCourtMatch(${cIdx})" title="優先整組退回準備區（若準備區皆滿則退回等待區）" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+                      退回
                     </button>
                   `
             : `
@@ -2949,7 +4354,7 @@
       }).join('');
     }
 
-    function renderCourtSlotHTML(courtIndex, slotIndex, player) {
+    function renderCourtSlotHTML(courtIndex, slotIndex, player, isNoviceCourt = false) {
       const isSelected =
         selectedSource &&
         selectedSource.type === 'COURT' &&
@@ -2959,9 +4364,9 @@
       if (!player) {
         return `
           <div onclick="handleCourtSlotClick(${courtIndex}, ${slotIndex})"
-               class="h-16 rounded-lg border border-dashed border-emerald-300/40 bg-emerald-950/40 hover:bg-emerald-900/50 flex flex-col items-center justify-center cursor-pointer transition ${isSelected ? 'selected-slot' : ''}">
-            <i class="fa-solid fa-plus text-emerald-300/60 text-xs"></i>
-            <span class="text-[10px] text-emerald-200/70">點擊排入</span>
+               class="h-16 rounded-lg border border-dashed ${isNoviceCourt ? 'border-lime-300/60 bg-teal-950/50 hover:bg-teal-900/60' : 'border-emerald-300/40 bg-emerald-950/40 hover:bg-emerald-900/50'} flex flex-col items-center justify-center cursor-pointer transition ${isSelected ? 'selected-slot' : ''}">
+            <i class="fa-solid fa-plus ${isNoviceCourt ? 'text-lime-300/75' : 'text-emerald-300/60'} text-xs"></i>
+            <span class="text-[10px] ${isNoviceCourt ? 'text-lime-200/80' : 'text-emerald-200/70'}">點擊排入</span>
           </div>
         `;
       }
@@ -2973,15 +4378,14 @@
 
       return `
         <div onclick="handleCourtSlotClick(${courtIndex}, ${slotIndex})"
-             class="h-16 rounded-lg bg-slate-950/85 hover:bg-slate-900 border border-emerald-400/30 p-1.5 pr-6 flex flex-col justify-between cursor-pointer transition relative group ${isSelected ? 'selected-slot' : ''}">
-          <!-- Cancel / Remove Player from Court 'X' Button -->
+             class="h-16 rounded-lg bg-slate-950/85 hover:bg-slate-900 border ${isNoviceCourt ? 'border-lime-300/60 shadow-sm shadow-lime-950/50' : 'border-emerald-400/30'} p-1.5 flex flex-col justify-between cursor-pointer transition relative group ${isSelected ? 'selected-slot' : ''}">
           <button onclick="removeCourtSlotPlayer(event, ${courtIndex}, ${slotIndex})"
                   title="取消「${escapeHTML(player.name)}」上場（退回等待區）"
-                  class="absolute top-1 right-1 w-5 h-5 rounded-full bg-slate-800/90 hover:bg-rose-600 text-slate-300 hover:text-white border border-slate-600 flex items-center justify-center text-[10px] shadow z-10 transition">
+                  class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-slate-800 hover:bg-rose-600 text-slate-300 hover:text-white border border-slate-600 flex items-center justify-center text-[9px] shadow z-10 transition">
             <i class="fa-solid fa-xmark"></i>
           </button>
 
-          <div class="flex items-center justify-between gap-1">
+          <div class="flex items-center justify-between gap-1 pr-2">
             <span class="font-extrabold text-xs text-white truncate">${escapeHTML(player.name)}</span>
             <span class="text-[10px] px-1.5 py-0.2 rounded border font-bold shrink-0 ${lvInfo.classes}">${lvInfo.label}</span>
           </div>
@@ -2996,68 +4400,282 @@
     }
 
     function renderPrepArea() {
-      const gridContainer = document.getElementById('prep-slots-grid');
-      gridContainer.innerHTML = [0, 1, 2, 3].map(idx => renderPrepSlotCard(idx)).join('');
+      normalizePrepSlotsArray();
+      const totalGroups = state.prepGroupCount || 2;
+      const maxLv = Number(state.noviceMaxLevel) || 4;
 
-      const activePlayers = state.prepSlots.map(id => getPlayerById(id)).filter(Boolean);
-      const filledCount = activePlayers.length;
-
-      const avgLevel = filledCount > 0
-        ? (activePlayers.reduce((sum, p) => sum + p.level, 0) / filledCount).toFixed(1)
-        : '-';
-
-      document.getElementById('prep-avg-stats').innerHTML = `平均級數: <strong class="text-white">${avgLevel}</strong>`;
-
-      const badge = document.getElementById('prep-chemistry-badge');
-      const hintEl = document.getElementById('prep-pair-history-hint');
-
-      if (filledCount === 4) {
-        let totalOverlap = 0;
-        for (let i = 0; i < 4; i++) {
-          for (let j = i + 1; j < 4; j++) {
-            totalOverlap += getPlayedTogetherCount(activePlayers[i].id, activePlayers[j].id);
-          }
-        }
-
-        const p0 = getPlayerById(state.prepSlots[0]);
-        const p1 = getPlayerById(state.prepSlots[1]);
-        const p2 = getPlayerById(state.prepSlots[2]);
-        const p3 = getPlayerById(state.prepSlots[3]);
-        const team1Sum = (p0?.level || 0) + (p1?.level || 0);
-        const team2Sum = (p2?.level || 0) + (p3?.level || 0);
-        const balanceInfo = evaluateQuartetSkillBalance(activePlayers);
-
-        if (totalOverlap === 0) {
-          badge.className = 'text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold';
-          badge.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i>全新組合・${balanceInfo.balanceType}`;
-        } else {
-          badge.className = 'text-[11px] px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold';
-          badge.innerHTML = `${balanceInfo.balanceType}（同場重疊 ${totalOverlap} 次）`;
-        }
-
-        hintEl.innerHTML = `⚖️ 隊伍實力：上隊(1,2格) <strong class="text-amber-300">${team1Sum}級</strong> vs 下隊(3,4格) <strong class="text-amber-300">${team2Sum}級</strong> ｜ 📊 今日彼此同場累計 <strong class="text-emerald-300">${totalOverlap}</strong> 人次`;
-      } else {
-        badge.className = 'text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 font-semibold';
-        badge.textContent = `準備區尚缺 ${4 - filledCount} 人`;
-        hintEl.textContent = '💡 提示：點擊任一位置即可與等待區球員替換，或按「智慧自動配點」';
+      const titleEl = document.getElementById('prep-section-title');
+      if (titleEl) {
+        titleEl.textContent = `下一場排點準備區（共 ${totalGroups} 組・${totalGroups * 4} 人候命）`;
       }
 
-      // Render dynamic dispatch buttons for all current courts
-      const dispatchContainer = document.getElementById('prep-dispatch-buttons');
-      if (dispatchContainer) {
-        dispatchContainer.innerHTML = `
-          <span class="text-xs text-slate-400 font-medium">派發上場：</span>
-          ${state.courts.map((c, idx) => {
+      const btnRemoveGroup = document.getElementById('btn-remove-prep-group');
+      const btnAddGroup = document.getElementById('btn-add-prep-group');
+      if (btnRemoveGroup) btnRemoveGroup.disabled = totalGroups <= 1;
+      if (btnAddGroup) btnAddGroup.disabled = totalGroups >= 6;
+
+      // Render N Prep Groups dynamically
+      const groupsContainer = document.getElementById('prep-groups-container');
+      let totalFilledAll = 0;
+      let readyGroupsCount = 0;
+
+      if (groupsContainer) {
+        groupsContainer.innerHTML = Array.from({ length: totalGroups }, (_, gIdx) => {
+          const base = gIdx * 4;
+          const groupPlayerIds = state.prepSlots.slice(base, base + 4);
+          const activePlayers = groupPlayerIds.map(id => getPlayerById(id)).filter(Boolean);
+          const filledCount = activePlayers.length;
+          totalFilledAll += filledCount;
+          if (filledCount === 4) readyGroupsCount++;
+
+          const avgLevel = filledCount > 0
+            ? (activePlayers.reduce((sum, p) => sum + p.level, 0) / filledCount).toFixed(1)
+            : '-';
+
+          let badgeHTML = '';
+          let hintHTML = '';
+
+          if (filledCount === 4) {
+            let totalOverlap = 0;
+            for (let i = 0; i < 4; i++) {
+              for (let j = i + 1; j < 4; j++) {
+                totalOverlap += getPlayedTogetherCount(activePlayers[i].id, activePlayers[j].id);
+              }
+            }
+            const p0 = getPlayerById(groupPlayerIds[0]);
+            const p1 = getPlayerById(groupPlayerIds[1]);
+            const p2 = getPlayerById(groupPlayerIds[2]);
+            const p3 = getPlayerById(groupPlayerIds[3]);
+            const team1Sum = (p0?.level || 0) + (p1?.level || 0);
+            const team2Sum = (p2?.level || 0) + (p3?.level || 0);
+            const balanceInfo = evaluateQuartetSkillBalance(activePlayers);
+            const prepPoolClass = getGroupPoolClassification(activePlayers);
+            const poolPrefix = prepPoolClass === 'NOVICE'
+              ? '🌱新手組・'
+              : prepPoolClass === 'REGULAR'
+                ? '🔥普通組・'
+                : '';
+
+            if (prepPoolClass === 'NOVICE') {
+              badgeHTML = `<span class="text-[11px] px-2.5 py-0.5 rounded-full bg-lime-400/25 text-lime-200 border border-lime-400/60 font-extrabold shadow-sm">${poolPrefix}${balanceInfo.balanceType}${totalOverlap > 0 ? ` (重疊${totalOverlap}次)` : ''}</span>`;
+            } else if (totalOverlap === 0) {
+              badgeHTML = `<span class="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold"><i class="fa-solid fa-circle-check mr-1"></i>${poolPrefix}全新組合・${balanceInfo.balanceType}</span>`;
+            } else {
+              badgeHTML = `<span class="text-[11px] px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold">${poolPrefix}${balanceInfo.balanceType}（同場重疊 ${totalOverlap} 次）</span>`;
+            }
+
+            hintHTML = `⚖️ 隊伍實力：上隊(1,2格) <strong class="text-amber-300">${team1Sum}級</strong> vs 下隊(3,4格) <strong class="text-amber-300">${team2Sum}級</strong> ｜ 📊 今日彼此同場累計 <strong class="text-emerald-300">${totalOverlap}</strong> 人次`;
+          } else {
+            badgeHTML = `<span class="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 font-semibold">尚缺 ${4 - filledCount} 人</span>`;
+            hintHTML = gIdx === 0
+              ? '💡 點擊任一位置即可與等待區或其他準備組互換'
+              : '💡 前一組上場後本組將自動往前遞補；也可直接指定派往任一球場';
+          }
+
+          const actionBtnsHTML = state.noviceModeEnabled
+            ? `
+                <button onclick="autoFillPrepGroup(${gIdx}, false, 'NOVICE')" title="只排 ≤${maxLv}級 的新手球友進入第 ${gIdx + 1} 組"
+                  class="px-2 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/35 border border-emerald-400/50 text-emerald-300 text-[11px] font-extrabold transition active:scale-95">
+                  🌱 排新手(≤${maxLv}級)
+                </button>
+                <button onclick="autoFillPrepGroup(${gIdx}, false, 'REGULAR')" title="只排 >${maxLv}級 的普通/熟手球友進入第 ${gIdx + 1} 組"
+                  class="px-2 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/50 text-amber-300 text-[11px] font-extrabold transition active:scale-95">
+                  🔥 排普通(>${maxLv}級)
+                </button>
+              `
+            : `
+                <button onclick="autoFillPrepGroup(${gIdx})"
+                  class="px-2.5 py-1 rounded-lg ${gIdx === 0 ? 'bg-indigo-600/30 hover:bg-indigo-600/50 border-indigo-400/40 text-indigo-200' : 'bg-violet-600/30 hover:bg-violet-600/50 border-violet-400/40 text-violet-200'} border text-[11px] font-bold transition active:scale-95">
+                  <i class="fa-solid fa-wand-magic-sparkles mr-0.5"></i>自動配第${gIdx + 1}組
+                </button>
+              `;
+
+          const dispatchBtnsHTML = state.courts.map((c, cIdx) => {
             const courtBusy = c.slots.some(Boolean);
             const disabled = filledCount < 4 || courtBusy;
+            const btnStyle = gIdx === 0
+              ? 'bg-emerald-600 hover:bg-emerald-500'
+              : 'bg-violet-600 hover:bg-violet-500';
             return `
-              <button onclick="assignPrepToCourt(${idx})" ${disabled ? 'disabled' : ''}
-                class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-bold text-xs transition active:scale-95">
-                <i class="fa-solid fa-play mr-1"></i>送入 ${escapeHTML(c.name)}
+              <button onclick="assignPrepToCourt(${cIdx}, ${gIdx})" ${disabled ? 'disabled' : ''}
+                class="px-2.5 py-1 rounded-lg ${btnStyle} disabled:opacity-40 text-white font-bold text-xs transition active:scale-95">
+                <i class="fa-solid fa-play mr-0.5"></i>${escapeHTML(c.name)}
               </button>
             `;
-          }).join('')}
-        `;
+          }).join('');
+
+          const borderCls = gIdx === 0 ? 'border-indigo-500/35' : 'border-violet-500/30';
+          const tagCls = gIdx === 0
+            ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
+            : 'bg-violet-500/20 border-violet-500/40 text-violet-300';
+          const groupTitle = gIdx === 0 ? '第 1 組（優先上場）' : `第 ${gIdx + 1} 組（預備候命）`;
+
+          return `
+            <div class="bg-slate-950/75 border ${borderCls} rounded-xl p-3">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="px-2 py-0.5 rounded-md border ${tagCls} text-xs font-extrabold">
+                    ${groupTitle}
+                  </span>
+                  <span class="text-[11px] text-slate-400 font-medium">平均級數: <strong class="text-white">${avgLevel}</strong></span>
+                  ${badgeHTML}
+                </div>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <div class="flex items-center gap-1">${actionBtnsHTML}</div>
+                  <button onclick="clearPrepGroup(${gIdx})"
+                    class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-rose-950/60 border border-slate-700 text-slate-300 hover:text-rose-300 text-[11px] font-semibold transition">
+                    清空
+                  </button>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                ${[base, base + 1, base + 2, base + 3].map(idx => renderPrepSlotCard(idx)).join('')}
+              </div>
+              <div class="mt-2.5 pt-2 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
+                <div class="text-[11px] text-slate-400">${hintHTML}</div>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] text-slate-400 font-medium">第${gIdx + 1}組派發：</span>
+                  ${dispatchBtnsHTML}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const topBadge = document.getElementById('prep-chemistry-badge');
+      if (topBadge) {
+        if (readyGroupsCount === totalGroups) {
+          topBadge.className = 'text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold';
+          topBadge.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i>全數排滿 (${totalFilledAll}/${totalGroups * 4}人)`;
+        } else if (readyGroupsCount > 0) {
+          topBadge.className = 'text-[11px] px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-bold';
+          topBadge.textContent = `已備妥 ${readyGroupsCount} 組 (${totalFilledAll}/${totalGroups * 4}人)`;
+        } else {
+          topBadge.className = 'text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 font-semibold';
+          topBadge.textContent = `準備區 (${totalFilledAll}/${totalGroups * 4}人)`;
+        }
+      }
+
+      // Top Smart Action Buttons (Standard vs Novice/Regular Split)
+      const topActionsEl = document.getElementById('prep-top-action-buttons');
+      if (topActionsEl) {
+        if (state.noviceModeEnabled) {
+          topActionsEl.innerHTML = `
+            <button onclick="autoFillPrepByPool('NOVICE')"
+              class="px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 active:scale-95 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-emerald-950/60 flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-seedling"></i>
+              排【新手場】(≤${maxLv}級) 到準備區
+            </button>
+            <button onclick="autoFillPrepByPool('REGULAR')"
+              class="px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 active:scale-95 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-amber-950/60 flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-fire"></i>
+              排【普通/熟手】(>${maxLv}級) 到準備區
+            </button>
+          `;
+        } else {
+          topActionsEl.innerHTML = `
+            <button onclick="autoFillPrepArea()"
+              class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-400 hover:to-violet-500 active:scale-95 text-white font-bold text-xs sm:text-sm shadow-lg shadow-indigo-950/60 flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-bolt"></i>
+              智慧自動配點 (填滿${totalGroups}組)
+            </button>
+          `;
+        }
+      }
+
+      // Novice Bar & Pool Counts
+      const noviceBtn = document.getElementById('novice-mode-toggle-btn');
+      const noviceConfigEl = document.getElementById('novice-level-config');
+      const noviceSelectEl = document.getElementById('novice-max-level-select');
+      const noviceCountsEl = document.getElementById('novice-pool-counts-hint');
+
+      if (noviceBtn) {
+        if (state.noviceModeEnabled) {
+          noviceBtn.className = 'px-2.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-emerald-300 font-extrabold text-xs flex items-center gap-1.5 transition active:scale-95';
+          noviceBtn.innerHTML = `<i class="fa-solid fa-toggle-on text-emerald-400 text-sm"></i><span>新手場分流：已啟用</span>`;
+        } else {
+          noviceBtn.className = 'px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs flex items-center gap-1.5 transition active:scale-95';
+          noviceBtn.innerHTML = `<i class="fa-solid fa-toggle-off text-slate-500 text-sm"></i><span>新手場分流：未啟用</span>`;
+        }
+      }
+      if (noviceConfigEl) {
+        if (state.noviceModeEnabled) {
+          noviceConfigEl.classList.remove('hidden');
+          noviceConfigEl.classList.add('flex');
+        } else {
+          noviceConfigEl.classList.add('hidden');
+          noviceConfigEl.classList.remove('flex');
+        }
+      }
+      if (noviceSelectEl) {
+        noviceSelectEl.value = String(maxLv);
+      }
+      if (noviceCountsEl && state.noviceModeEnabled) {
+        const activeNonHost = state.players.filter(p => !isHostPlayer(p) && p.checkedIn && !p.resting);
+        const novCnt = activeNonHost.filter(p => isPlayerInPoolType(p, 'NOVICE')).length;
+        const regCnt = activeNonHost.filter(p => isPlayerInPoolType(p, 'REGULAR')).length;
+        noviceCountsEl.textContent = `(在場新手${novCnt}人 / 普通${regCnt}人)`;
+      }
+
+      // Binding Status Bar & Strip
+      const bindStatusBar = document.getElementById('binding-status-bar');
+      const bindStrip = document.getElementById('binding-groups-strip');
+      const enabledBinds = (state.bindingGroups || []).filter(g => g.enabled && (g.playerIds || []).length >= 2);
+
+      if (bindStatusBar) {
+        if (enabledBinds.length === 0) {
+          bindStatusBar.innerHTML = `<span class="text-[11px] text-slate-500">尚未設定綁定</span>`;
+        } else if (state.bindingSystemActive) {
+          bindStatusBar.innerHTML = `
+            <span class="px-2 py-0.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[11px] font-extrabold flex items-center gap-1">
+              <i class="fa-solid fa-circle-check"></i> 已生效參考中 (${enabledBinds.length}組)
+            </span>
+            <button onclick="deactivateBindings()" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-rose-950/60 border border-slate-700 text-slate-300 hover:text-rose-300 text-[10px] font-bold transition">
+              暫停參考
+            </button>
+          `;
+        } else {
+          bindStatusBar.innerHTML = `
+            <span class="px-2 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[11px] font-extrabold flex items-center gap-1">
+              <i class="fa-solid fa-clock"></i> 待確認生效 (${enabledBinds.length}組)
+            </span>
+            <button onclick="confirmAndActivateBindings()" class="px-2.5 py-0.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-[11px] font-black shadow transition active:scale-95">
+              ✓ 點此確認生效
+            </button>
+          `;
+        }
+      }
+
+      if (bindStrip) {
+        if (enabledBinds.length === 0) {
+          bindStrip.classList.add('hidden');
+          bindStrip.classList.remove('flex');
+        } else {
+          bindStrip.classList.remove('hidden');
+          bindStrip.classList.add('flex');
+          bindStrip.innerHTML = enabledBinds.map(bg => {
+            const members = bg.playerIds.map(id => getPlayerById(id)).filter(Boolean);
+            const names = members.map(m => escapeHTML(m.name)).join('＋');
+            const locStatus = getBindingGroupLocationStatus(members);
+            const modeText = bg.mode === 'FULL' ? '全場綁定' : '單次綁定';
+            const effPool = getBindingGroupEffectivePool(bg);
+            const poolTag = state.noviceModeEnabled
+              ? `・${effPool === 'NOVICE' ? '🌱新手組' : '🔥普通組'}`
+              : '';
+            const modeCls = bg.mode === 'FULL'
+              ? 'bg-amber-500/15 border-amber-500/40 text-amber-300'
+              : 'bg-sky-500/15 border-sky-500/40 text-sky-300';
+            return `
+              <span onclick="openBindingModal()" title="點擊管理綁定設定"
+                    class="px-2 py-0.5 rounded-lg border ${modeCls} font-bold cursor-pointer flex items-center gap-1">
+                <i class="fa-solid fa-link text-[10px]"></i>
+                <span>[${modeText}${poolTag}] ${names}</span>
+                <span class="text-[10px] ${locStatus.colorClass}">(${locStatus.shortText})</span>
+              </span>
+            `;
+          }).join('');
+        }
       }
     }
 
@@ -3065,13 +4683,14 @@
       const playerId = state.prepSlots[slotIndex];
       const player = getPlayerById(playerId);
       const isSelected = selectedSource && selectedSource.type === 'PREP' && selectedSource.slotIndex === slotIndex;
+      const posInGroup = (slotIndex % 4) + 1;
 
       if (!player) {
         return `
           <div onclick="handlePrepSlotClick(${slotIndex})"
                class="h-20 rounded-xl border-2 border-dashed border-slate-700 hover:border-indigo-400 bg-slate-900/50 hover:bg-slate-900 flex flex-col items-center justify-center cursor-pointer transition ${isSelected ? 'selected-slot' : ''}">
             <i class="fa-solid fa-user-plus text-slate-500 text-sm mb-1"></i>
-            <span class="text-xs text-slate-400 font-semibold">點擊選取球員</span>
+            <span class="text-xs text-slate-400 font-semibold">點擊選取 (#${posInGroup})</span>
           </div>
         `;
       }
@@ -3080,10 +4699,11 @@
       const tsInfo = isHostPlayer(player)
         ? { text: '👑團主', classes: 'bg-amber-500/20 text-amber-300 border-amber-400/50' }
         : getTimeSlotBadge(player.timeSlot);
+      const activeBg = getPlayerBindingGroup(player.id, true);
 
       return `
         <div onclick="handlePrepSlotClick(${slotIndex})"
-             class="h-20 rounded-xl bg-slate-900 hover:bg-slate-800/90 border border-slate-700 p-2.5 flex flex-col justify-between cursor-pointer transition relative group ${isSelected ? 'selected-slot' : ''}">
+             class="h-20 rounded-xl bg-slate-900 hover:bg-slate-800/90 border ${activeBg ? 'border-amber-400/60' : 'border-slate-700'} p-2.5 flex flex-col justify-between cursor-pointer transition relative group ${isSelected ? 'selected-slot' : ''}">
           <button onclick="removePrepSlotPlayer(event, ${slotIndex})" title="移出準備區"
                   class="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-slate-800 hover:bg-rose-600 text-slate-300 hover:text-white border border-slate-600 flex items-center justify-center text-[10px] shadow">
             <i class="fa-solid fa-xmark"></i>
@@ -3093,7 +4713,10 @@
             <span class="text-[11px] px-1.5 py-0.2 rounded-md border font-bold shrink-0 ${lvInfo.classes}">${lvInfo.label}</span>
           </div>
           <div class="flex items-center justify-between text-[11px] text-slate-400">
-            <span class="px-1.5 py-0.2 rounded border text-[10px] font-semibold ${tsInfo.classes}">${tsInfo.text}</span>
+            <div class="flex items-center gap-1">
+              <span class="px-1.5 py-0.2 rounded border text-[10px] font-semibold ${tsInfo.classes}">${tsInfo.text}</span>
+              ${activeBg ? `<span class="text-[10px] text-amber-300 font-bold" title="已生效排點綁定">🔗${activeBg.mode === 'FULL' ? '全' : '單'}</span>` : ''}
+            </div>
             <button onclick="event.stopPropagation(); openHistoryModal('${player.id}')" class="font-bold text-slate-300 hover:text-amber-300 underline decoration-dotted" title="查看與誰打過">
               已上 <strong class="text-emerald-400">${player.games}</strong> 場 🔍
             </button>
@@ -3110,6 +4733,8 @@
       const eligibleNow = isHost ? true : isPlayerEligibleInCurrentHour(p);
       const isSelectedRoster = selectedSource && selectedSource.type === 'ROSTER' && selectedSource.playerId === p.id;
       const isFinished = !!p.resting;
+      const isTempBreak = !isFinished && !!p.tempBreak;
+      const activeBg = getPlayerBindingGroup(p.id, true);
 
       const playedWithEntries = Object.entries(p.playedWith || {}).sort((a, b) => b[1] - a[1]);
       const recentPlayedText = playedWithEntries.length > 0
@@ -3123,16 +4748,22 @@
       if (isFinished) {
         const reasonLabel = p.endReason === 'TIME_UP' ? '⏰ 時間到結束' : '🏁 已結束/離場';
         statusBadge = `<span class="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[10px] font-bold">${reasonLabel}${loc.status === 'COURT' ? ' (場上最後一場)' : ''}</span>`;
+      } else if (isTempBreak) {
+        statusBadge = `<span class="px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 border border-sky-400/50 text-[10px] font-extrabold">☕ 暫時休息(排點略過)${loc.status === 'COURT' ? '・此場後生效' : ''}</span>`;
       } else if (loc.status === 'COURT') {
         statusBadge = `<span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold">${loc.label}</span>`;
       } else if (loc.status === 'PREP') {
-        statusBadge = `<span class="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[10px] font-bold">準備區</span>`;
+        statusBadge = `<span class="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[10px] font-bold">${loc.label}</span>`;
       } else if (isHost) {
         statusBadge = `<span class="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[10px] font-bold">僅手動排點</span>`;
       } else if (!eligibleNow) {
         statusBadge = `<span class="px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30 text-[10px] font-bold">非本時段</span>`;
       } else {
         statusBadge = `<span class="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[10px] font-semibold">等待中</span>`;
+      }
+      if (activeBg) {
+        const mates = activeBg.playerIds.filter(id => id !== p.id).map(id => getPlayerById(id)?.name || '').filter(Boolean).join('、');
+        statusBadge += ` <span class="px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-400/50 text-[10px] font-extrabold" title="與 ${escapeHTML(mates)} 綁定同場">🔗${activeBg.mode === 'FULL' ? '全場綁定' : '單次綁定'}(${escapeHTML(mates)})</span>`;
       }
 
       const effGames = getPlayerEffectiveGames(p);
@@ -3141,13 +4772,13 @@
       return `
         <div onclick="openHistoryModal('${p.id}')"
              title="點擊查看「${escapeHTML(p.name)}」今日總共跟誰打過"
-             class="bg-slate-950/90 hover:bg-slate-900 border ${isSelectedRoster ? 'selected-slot' : isHost ? 'border-amber-500/40 bg-amber-950/10 hover:border-amber-400' : isFinished ? 'border-slate-800/60 hover:border-amber-500/40 bg-slate-950/50' : 'border-slate-800/90 hover:border-amber-500/40'} rounded-xl p-2.5 flex flex-col gap-1.5 transition cursor-pointer ${(!eligibleNow && !isFinished) ? 'opacity-65' : ''}">
+             class="bg-slate-950/90 hover:bg-slate-900 border ${isSelectedRoster ? 'selected-slot' : isHost ? 'border-amber-500/40 bg-amber-950/10 hover:border-amber-400' : isFinished ? 'border-slate-800/60 hover:border-amber-500/40 bg-slate-950/50' : isTempBreak ? 'border-sky-500/40 bg-sky-950/15 hover:border-sky-400/60' : 'border-slate-800/90 hover:border-amber-500/40'} rounded-xl p-2.5 flex flex-col gap-1.5 transition cursor-pointer ${(!eligibleNow && !isFinished) ? 'opacity-65' : ''}">
           
           <div class="flex items-center justify-between gap-2">
             <!-- Left: Player Name + Skill Level + Time Slot / Host Badge -->
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="font-extrabold text-sm ${isFinished ? 'text-slate-300' : isHost ? 'text-amber-200' : 'text-white'} truncate hover:text-amber-300 transition">${escapeHTML(p.name)}</span>
+                <span class="font-extrabold text-sm ${isFinished ? 'text-slate-300' : isHost ? 'text-amber-200' : isTempBreak ? 'text-sky-200' : 'text-white'} truncate hover:text-amber-300 transition">${escapeHTML(p.name)}</span>
                 <span class="text-[11px] px-1.5 py-0.2 rounded-md border font-bold ${lvInfo.classes}" title="台灣推廣 ${lvInfo.label} (${lvInfo.tier})">
                   ${lvInfo.label}・${lvInfo.tier}
                 </span>
@@ -3163,7 +4794,7 @@
               </div>
             </div>
 
-            <!-- Right: Paid Toggle + Finish/Restore Toggle + Assign to Prep Button -->
+            <!-- Right: Paid Toggle + TempBreak Toggle + Finish/Restore Toggle + Assign to Prep Button -->
             <div class="flex items-center gap-1 shrink-0" onclick="event.stopPropagation()">
               ${!isHost
           ? `<button onclick="togglePlayerPaid('${p.id}')" title="點擊切換繳費狀態"
@@ -3185,6 +4816,13 @@
                 `
           : `
                   ${!isHost ? `
+                    <button onclick="togglePlayerTempBreak('${p.id}')" title="${isTempBreak ? '點擊恢復參與智慧排點' : '暫時休息/離開（智慧排點將暫時略過此人，隨時可點恢復）'}"
+                            class="px-2 py-1.5 rounded-xl border font-extrabold text-[11px] transition active:scale-95 ${isTempBreak
+              ? 'bg-sky-500 hover:bg-sky-400 border-sky-400 text-slate-950 shadow'
+              : 'bg-slate-800 hover:bg-sky-500/20 border-slate-700 hover:border-sky-500/40 text-slate-300 hover:text-sky-300'
+            }">
+                      ${isTempBreak ? '▶恢復' : '☕暫休'}
+                    </button>
                     <button onclick="togglePlayerRest('${p.id}', 'EARLY')" title="時間到或臨時有事提早結束（不再排點，保留今日紀錄）"
                             class="px-2 py-1.5 rounded-xl bg-slate-800 hover:bg-amber-500/20 border border-slate-700 hover:border-amber-500/40 text-slate-300 hover:text-amber-300 font-bold text-[11px] transition active:scale-95">
                       結束
@@ -3244,13 +4882,13 @@
           return `<button onclick="setRosterFilter('${t.key}')" class="roster-tab px-2.5 py-1 rounded-lg text-xs font-bold whitespace-nowrap transition ${active ? 'bg-emerald-500 text-slate-950 shadow' : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'}">${escapeHTML(t.label)}</button>`;
         }).join('');
       }
-
-      // 2. Render dynamic Early-Ending SubSlot Time-Up Buttons (e.g. 18-20時間到結束)
+      // 2. Render dynamic Early-Ending SubSlot Time-Up Buttons (supports overnight & half-hour slots)
       const earlyButtonsEl = document.getElementById('early-end-slot-buttons');
       if (earlyButtonsEl) {
         const earlySubSlots = configuredSlots.slice(1).filter(s => {
           const p = parseTimeRange(s);
-          return p && totalParsed && p.end < totalParsed.end;
+          const aligned = alignSubSlotToTotalTimeline(p, totalParsed);
+          return aligned && totalParsed && aligned.absEnd < totalParsed.absEnd - 0.001;
         });
 
         earlyButtonsEl.innerHTML = earlySubSlots.map(s => {
@@ -3529,10 +5167,16 @@
                 </div>
               </div>
 
-              <button onclick="event.stopPropagation(); openEditPlayerModal('${p.id}')" title="編輯報名資料"
-                      class="w-7 h-7 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-xs shrink-0">
-                <i class="fa-solid fa-pen"></i>
-              </button>
+              <div class="flex items-center gap-1 shrink-0" onclick="event.stopPropagation()">
+                <button onclick="openEditPlayerModal('${p.id}')" title="編輯報名資料"
+                        class="w-7 h-7 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-xs transition active:scale-95">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+                <button onclick="deletePlayerDirectly('${p.id}')" title="直接刪除此球員"
+                        class="w-7 h-7 rounded-lg bg-slate-900 hover:bg-rose-600 border border-slate-700 hover:border-rose-500 text-slate-400 hover:text-white flex items-center justify-center text-xs transition active:scale-95">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
             </div>
 
             <!-- Action Bar: Check-In Toggle + Paid Toggle -->
@@ -3574,8 +5218,57 @@
     }
 
     /********************************************************************
-     * 11. PLAYER CRUD & INDIVIDUAL HISTORY MODAL
+     * 11. PLAYER CRUD, TEMP BREAK, DELETE CONFIRMATION & HISTORY MODAL
      ********************************************************************/
+    function deletePlayerDirectly(playerId) {
+      const p = getPlayerById(playerId);
+      if (!p) return;
+      pendingDeletePlayerId = playerId;
+      const nameEl = document.getElementById('delete-confirm-player-name');
+      if (nameEl) nameEl.textContent = p.name;
+      const modal = document.getElementById('delete-confirm-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeDeleteConfirmModal() {
+      pendingDeletePlayerId = null;
+      const modal = document.getElementById('delete-confirm-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function confirmDeletePlayer() {
+      if (!pendingDeletePlayerId) {
+        closeDeleteConfirmModal();
+        return;
+      }
+      const playerId = pendingDeletePlayerId;
+      const p = getPlayerById(playerId);
+      closeDeleteConfirmModal();
+      closeHistoryModal();
+      if (!p) return;
+
+      removePlayerFromEverywhere(playerId);
+      state.players = state.players.filter(item => item.id !== playerId);
+      if (Array.isArray(state.bindingGroups)) {
+        state.bindingGroups.forEach(bg => {
+          if (Array.isArray(bg.playerIds)) {
+            bg.playerIds = bg.playerIds.filter(id => id !== playerId);
+          }
+        });
+        state.bindingGroups = state.bindingGroups.filter(bg => (bg.playerIds || []).length >= 2);
+      }
+      clearSelection();
+      saveState();
+      renderAll();
+      showToast(`🗑️ 已刪除球員「${p.name}」`, 'warn');
+    }
+
     function togglePlayerCheckIn(playerId) {
       const p = getPlayerById(playerId);
       if (!p) return;
@@ -3586,11 +5279,13 @@
           return;
         }
         p.checkedIn = false;
+        p.tempBreak = false;
         state.prepSlots = state.prepSlots.map(id => (id === playerId ? null : id));
         showToast(`已將「${p.name}」設為尚未到場（移出現場排點區）`, 'info');
       } else {
         p.checkedIn = true;
         p.resting = false;
+        p.tempBreak = false;
         p.endReason = null;
         showToast(`✅「${p.name}」已報到到場！現在可進入現場排點區排點`, 'success');
       }
@@ -3604,6 +5299,7 @@
       p.checkedIn = true;
       p.paid = true;
       p.resting = false;
+      p.tempBreak = false;
       p.endReason = null;
       saveState();
       renderAll();
@@ -3641,10 +5337,32 @@
       showToast(`${p.name} 已標記為「${p.paid ? '已繳費' : '未繳費'}」`, p.paid ? 'success' : 'warn');
     }
 
+    function togglePlayerTempBreak(playerId) {
+      const p = getPlayerById(playerId);
+      if (!p) return;
+      p.tempBreak = !p.tempBreak;
+      if (p.tempBreak) {
+        const loc = getPlayerLocation(playerId);
+        if (loc.status === 'PREP') {
+          state.prepSlots = state.prepSlots.map(id => (id === playerId ? null : id));
+          showToast(`☕「${p.name}」已設為暫時休息（已自動移出準備區，排點將暫時略過）`, 'info');
+        } else if (loc.status === 'COURT') {
+          showToast(`☕「${p.name}」已設為暫時休息（此場打完後排點將暫時略過，隨時可點恢復）`, 'info');
+        } else {
+          showToast(`☕「${p.name}」已設為暫時休息，智慧排點將暫時略過此人`, 'info');
+        }
+      } else {
+        showToast(`▶「${p.name}」已結束暫休，恢復參與智慧排點！`, 'success');
+      }
+      saveState();
+      renderAll();
+    }
+
     function togglePlayerRest(playerId, reason = 'EARLY') {
       const p = getPlayerById(playerId);
       if (!p) return;
       p.resting = !p.resting;
+      p.tempBreak = false;
       if (p.resting) {
         p.endReason = reason;
         state.prepSlots = state.prepSlots.map(id => (id === playerId ? null : id));
@@ -3708,7 +5426,7 @@
 
       container.innerHTML = slots.map((s, idx) => {
         const parsed = parseTimeRange(s);
-        const timeLabel = parsed ? `${parsed.start}:00 - ${parsed.end}:00` : s;
+        const timeLabel = parsed ? parsed.clockRange : s;
         const subLabel = idx === 0
           ? `全場 (${parsed ? parsed.duration + '小時' : '主時段'})`
           : `分時段 (${parsed ? parsed.duration + '小時' : '子時段'})`;
@@ -3928,12 +5646,7 @@
       };
 
       document.getElementById('hist-delete-btn').onclick = () => {
-        removePlayerFromEverywhere(playerId);
-        state.players = state.players.filter(item => item.id !== playerId);
-        closeHistoryModal();
-        saveState();
-        renderAll();
-        showToast(`已刪除「${p.name}」`, 'warn');
+        deletePlayerDirectly(playerId);
       };
 
       document.getElementById('history-modal').classList.remove('hidden');
@@ -3946,10 +5659,15 @@
     }
 
     /********************************************************************
-     * 12. FINANCE, MATCH LOG & SETTINGS MODALS
+     * 12. DYNAMIC MULTI-TIMESLOT FINANCE, MATCH LOG & SETTINGS MODALS
      ********************************************************************/
     function openFinanceModal() {
-      updateFinanceCalc();
+      ensureSlotFeesInitialized();
+      const elCost = document.getElementById('fin-cost-per-shuttle');
+      if (elCost) elCost.value = typeof state.costPerShuttle === 'number' ? state.costPerShuttle : 85;
+
+      renderFinanceDynamicSlotInputs();
+      updateFinanceCalc(false);
       document.getElementById('finance-modal').classList.remove('hidden');
       document.getElementById('finance-modal').classList.add('flex');
     }
@@ -3959,15 +5677,77 @@
       document.getElementById('finance-modal').classList.remove('flex');
     }
 
-    function updateFinanceCalc() {
-      const feePerPerson = Number(document.getElementById('fin-fee-per-person')?.value) || 0;
-      const costPerShuttle = Number(document.getElementById('fin-cost-per-shuttle')?.value) || 0;
+    function renderFinanceDynamicSlotInputs() {
+      const container = document.getElementById('fin-dynamic-slot-cards');
+      if (!container) return;
+      const allSlots = getAllConfiguredSlots();
+
+      if (allSlots.length === 1) {
+        container.className = 'grid grid-cols-1 gap-2.5';
+      } else if (allSlots.length === 2) {
+        container.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2.5';
+      } else {
+        container.className = 'grid grid-cols-1 sm:grid-cols-3 gap-2.5';
+      }
+
+      const borderColors = [
+        { box: 'border-emerald-500/30', label: 'text-emerald-300', input: 'text-emerald-300 focus:border-emerald-400' },
+        { box: 'border-sky-500/30', label: 'text-sky-300', input: 'text-sky-300 focus:border-sky-400' },
+        { box: 'border-purple-500/30', label: 'text-purple-300', input: 'text-purple-300 focus:border-purple-400' },
+        { box: 'border-indigo-500/30', label: 'text-indigo-300', input: 'text-indigo-300 focus:border-indigo-400' }
+      ];
+
+      container.innerHTML = allSlots.map((slotStr, idx) => {
+        const parsed = parseTimeRange(slotStr);
+        const durLabel = parsed ? `(${parsed.duration}小時)` : '';
+        const feeVal = getDefaultFeeForSlot(slotStr);
+        const style = borderColors[idx % borderColors.length];
+        return `
+          <div class="bg-slate-950 border ${style.box} rounded-xl p-3">
+            <label class="block text-[11px] font-bold ${style.label} mb-1">${escapeHTML(slotStr)} 時段 ${durLabel}</label>
+            <input type="number" data-fin-slot="${escapeHTML(slotStr)}" value="${feeVal}" oninput="updateFinanceCalc(true)"
+              class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-sm font-bold ${style.input} focus:outline-none" />
+            <div id="fin-sub-slot-${escapeHTML(slotStr)}" class="text-[11px] text-slate-400 mt-1.5 font-semibold">已繳 0/0 人 ＝ $0</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateFinanceCalc(userEdited = false) {
+      ensureSlotFeesInitialized();
+      const allSlots = getAllConfiguredSlots();
+
+      if (userEdited) {
+        document.querySelectorAll('input[data-fin-slot]').forEach(inp => {
+          const slotKey = inp.getAttribute('data-fin-slot');
+          if (slotKey) {
+            state.slotFees[slotKey] = Math.max(0, Number(inp.value) || 0);
+          }
+        });
+      }
+
+      const costPerShuttle = Math.max(0, Number(document.getElementById('fin-cost-per-shuttle')?.value) || 0);
+      state.costPerShuttle = costPerShuttle;
+      saveState();
 
       const regularPlayers = state.players.filter(p => !isHostPlayer(p));
       const paidPlayers = regularPlayers.filter(p => p.paid);
       const unpaidPlayers = regularPlayers.filter(p => !p.paid);
 
-      const collected = paidPlayers.length * feePerPerson;
+      let collected = 0;
+      allSlots.forEach(slotStr => {
+        const fee = getDefaultFeeForSlot(slotStr);
+        const slotAll = regularPlayers.filter(p => p.timeSlot === slotStr);
+        const slotPaid = slotAll.filter(p => p.paid);
+        const subTotal = slotPaid.length * fee;
+        collected += subTotal;
+
+        const subEl = document.getElementById(`fin-sub-slot-${slotStr}`);
+        if (subEl) {
+          subEl.textContent = `已繳 ${slotPaid.length}/${slotAll.length} 人 ＝ $${subTotal.toLocaleString()}`;
+        }
+      });
+
       const shuttleCost = (state.shuttlesUsed || 0) * costPerShuttle;
       const net = collected - shuttleCost;
 
@@ -3981,12 +5761,15 @@
       if (unpaidPlayers.length === 0) {
         unpaidContainer.innerHTML = `<span class="text-xs text-emerald-400 font-bold">🎉 全員皆已繳費完畢！</span>`;
       } else {
-        unpaidContainer.innerHTML = unpaidPlayers.map(p => `
-          <button onclick="togglePlayerPaid('${p.id}'); updateFinanceCalc();"
-                  class="px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-emerald-500/20 border border-rose-500/40 text-rose-200 hover:text-emerald-300 text-xs font-bold transition">
-            ${escapeHTML(p.name)} (${escapeHTML(p.timeSlot)}) - 點擊標記已繳
-          </button>
-        `).join('');
+        unpaidContainer.innerHTML = unpaidPlayers.map(p => {
+          const pFee = getDefaultFeeForSlot(p.timeSlot);
+          return `
+            <button onclick="togglePlayerPaid('${p.id}'); updateFinanceCalc(false);"
+                    class="px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-emerald-500/20 border border-rose-500/40 text-rose-200 hover:text-emerald-300 text-xs font-bold transition">
+              ${escapeHTML(p.name)} (${escapeHTML(p.timeSlot)}・$${pFee}) - 點擊標記已繳
+            </button>
+          `;
+        }).join('');
       }
     }
 
@@ -4038,6 +5821,7 @@
         p.playedWith = {};
         p.lastPlayedAt = 0;
         p.resting = false;
+        p.tempBreak = false;
         p.endReason = null;
         if (isHostPlayer(p)) {
           p.paid = true;
@@ -4051,14 +5835,17 @@
         c.slots = [null, null, null, null];
         c.startTime = null;
       });
-      state.prepSlots = [null, null, null, null];
+      normalizePrepSlotsArray();
+      state.prepSlots = new Array(state.prepGroupCount * 4).fill(null);
       state.shuttlesUsed = 0;
       state.endedSubSlots = {};
+      state.bindingGroups = [];
+      state.bindingSystemActive = false;
       state.matchLogs = [];
       closeSettingsModal();
       saveState();
       renderAll();
-      showToast('已開啟新的一天！場次歸零，球友重置為「尚未到場」等待點名', 'success');
+      showToast('已開啟新的一天！場次與綁定歸零，球友重置為「尚未到場」等待點名', 'success');
     }
 
     function loadDemoPlayers() {
@@ -4068,14 +5855,17 @@
       state.courts = [
         { id: 1, name: '1號場', slots: ['p1', 'p2', 'p3', 'p4'], startTime: Date.now() - 240000 }
       ];
-      state.prepSlots = ['p5', 'p6', 'p7', 'p8'];
+      state.prepGroupCount = 2;
+      state.prepSlots = ['p5', 'p6', 'p7', 'p8', 'p10', 'p12', 'p16', 'p13'];
       state.shuttlesUsed = 4;
       state.endedSubSlots = {};
+      state.bindingGroups = [];
+      state.bindingSystemActive = false;
       state.matchLogs = [];
       closeSettingsModal();
       saveState();
       renderAll();
-      showToast('已載入測試球友名單（預設 1 面場地，可隨時點擊「+ 擴增場地」）', 'success');
+      showToast('已載入測試球友名單（預設 1 面場地、2 組準備區，可隨時點擊擴增）', 'success');
     }
 
     function clearAllPlayers() {
@@ -4085,9 +5875,12 @@
       state.courts = [
         { id: 1, name: '1號場', slots: [null, null, null, null], startTime: null }
       ];
-      state.prepSlots = [null, null, null, null];
+      state.prepGroupCount = 2;
+      state.prepSlots = [null, null, null, null, null, null, null, null];
       state.shuttlesUsed = 0;
       state.endedSubSlots = {};
+      state.bindingGroups = [];
+      state.bindingSystemActive = false;
       state.matchLogs = [];
       closeSettingsModal();
       saveState();
